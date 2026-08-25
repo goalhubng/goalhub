@@ -273,7 +273,74 @@ const allTeams = [
   {name: "Kortrijk", league: "Jupiler Pro", logo: "https://upload.wikimedia.org/wikipedia/en/thumb/1/17/KV_Kortrijk_logo_2016.svg/330px-KV_Kortrijk_logo_2016.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},
   {name: "RWDM", league: "Jupiler Pro", logo: "https://upload.wikimedia.org/wikipedia/en/9/9f/RWD_Molenbeek_logo.svg"},
   {name: "Dender", league: "Jupiler Pro", logo: "https://upload.wikimedia.org/wikipedia/en/9/98/FCVDenderEH.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"},
-  {name: "Beerschot", league: "Jupiler Pro", logo: "https://upload.wikimedia.org/wikipedia/en/thumb/2/27/Koninklijke_Beerschot_Voetbalclub_Antwerpen_logo.svg/330px-Koninklijke_Beerschot_Voetbalclub_Antwerpen_logo.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"}
+  {name: "Beerschot", league: "Jupiler Pro", logo: "https://upload.wikimedia.org/wikipedia/en/thumb/2/27/Koninklijke_Beerschot_Voetbalclub_Antwerpen_logo.svg/330px-Koninklijke_Beerschot_Voetbalclub_Antwerpen_logo.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"},
+
+  // MLS (USA/Canada) - 30, badges verified individually via TheSportsDB
+  // since its bulk team-list endpoint is capped at 10 on the free tier.
+  {name: "Atlanta United", league: "MLS", logo: "https://r2.thesportsdb.com/images/media/team/badge/ej091x1602103070.png"},
+  {name: "Austin FC", league: "MLS", logo: "https://r2.thesportsdb.com/images/media/team/badge/a3dlg61595434277.png"},
+  {name: "CF Montreal", league: "MLS", logo: "https://r2.thesportsdb.com/images/media/team/badge/livdl31679344925.png"},
+  {name: "Charlotte FC", league: "MLS", logo: "https://r2.thesportsdb.com/images/media/team/badge/b6p4uz1595434047.png"},
+  {name: "Chicago Fire", league: "MLS", logo: "https://r2.thesportsdb.com/images/media/team/badge/8xuc781639493166.png"},
+  {name: "Colorado Rapids", league: "MLS", logo: "https://r2.thesportsdb.com/images/media/team/badge/uppupv1473536412.png"},
+  {name: "Columbus Crew", league: "MLS", logo: "https://r2.thesportsdb.com/images/media/team/badge/dzs8cp1629059854.png"},
+  {name: "DC United", league: "MLS", logo: "https://r2.thesportsdb.com/images/media/team/badge/uwvsyt1467462609.png"},
+  {name: "FC Cincinnati", league: "MLS", logo: "https://r2.thesportsdb.com/images/media/team/badge/vvhsqc1707631046.png"},
+  {name: "FC Dallas", league: "MLS", logo: "https://r2.thesportsdb.com/images/media/team/badge/vxy8xy1602103187.png"},
+  {name: "Houston Dynamo", league: "MLS", logo: "https://r2.thesportsdb.com/images/media/team/badge/yvz9dq1707631352.png"},
+  {name: "Sporting Kansas City", league: "MLS", logo: "https://r2.thesportsdb.com/images/media/team/badge/tqupxw1473536504.png"},
+  {name: "LA Galaxy", league: "MLS", logo: "https://r2.thesportsdb.com/images/media/team/badge/ysyysr1420227188.png"},
+  {name: "Los Angeles FC", league: "MLS", logo: "https://r2.thesportsdb.com/images/media/team/badge/7nbj2a1602103638.png"},
+  {name: "Inter Miami", league: "MLS", logo: "https://r2.thesportsdb.com/images/media/team/badge/m4it3e1602103647.png"},
+  {name: "Minnesota United", league: "MLS", logo: "https://r2.thesportsdb.com/images/media/team/badge/vl67t41492453433.png"},
+  {name: "Nashville SC", league: "MLS", logo: "https://r2.thesportsdb.com/images/media/team/badge/znrwt71602103062.png"},
+  {name: "New England Revolution", league: "MLS", logo: "https://r2.thesportsdb.com/images/media/team/badge/1ula2l1639493143.png"},
+  {name: "New York City FC", league: "MLS", logo: "https://r2.thesportsdb.com/images/media/team/badge/m9vis71735140655.png"},
+  {name: "New York Red Bulls", league: "MLS", logo: "https://r2.thesportsdb.com/images/media/team/badge/suytvy1473536462.png"},
+  {name: "Orlando City", league: "MLS", logo: "https://r2.thesportsdb.com/images/media/team/badge/qyppxw1423832326.png"},
+  {name: "Philadelphia Union", league: "MLS", logo: "https://r2.thesportsdb.com/images/media/team/badge/gyznyo1602103682.png"},
+  {name: "Portland Timbers", league: "MLS", logo: "https://r2.thesportsdb.com/images/media/team/badge/skm30j1557953559.png"},
+  {name: "Real Salt Lake", league: "MLS", logo: "https://r2.thesportsdb.com/images/media/team/badge/kkjlfa1556488022.png"},
+  {name: "San Diego FC", league: "MLS", logo: "https://r2.thesportsdb.com/images/media/team/badge/7ka2xd1734621068.png"},
+  {name: "San Jose Earthquakes", league: "MLS", logo: "https://r2.thesportsdb.com/images/media/team/badge/xyrqqt1420781048.png"},
+  {name: "Seattle Sounders", league: "MLS", logo: "https://r2.thesportsdb.com/images/media/team/badge/2dy5cx1706711036.png"},
+  {name: "St. Louis City SC", league: "MLS", logo: "https://r2.thesportsdb.com/images/media/team/badge/22wanp1674118724.png"},
+  {name: "Toronto FC", league: "MLS", logo: "https://r2.thesportsdb.com/images/media/team/badge/rsxyrr1473536512.png"},
+  {name: "Vancouver Whitecaps", league: "MLS", logo: "https://r2.thesportsdb.com/images/media/team/badge/tpwxpy1473536521.png"},
+
+  // LIGA PROFESIONAL ARGENTINA - 29. San Lorenzo's only entry in our free
+  // data source is their basketball team, not football — rather than show
+  // a wrong badge, it's left blank so the site's existing initials-avatar
+  // fallback handles it honestly.
+  {name: "Aldosivi", league: "Liga Profesional Argentina", logo: "https://r2.thesportsdb.com/images/media/team/badge/nqrjqb1517767667.png"},
+  {name: "Argentinos Juniors", league: "Liga Profesional Argentina", logo: "https://r2.thesportsdb.com/images/media/team/badge/uqfjuo1769234850.png"},
+  {name: "Atletico Tucuman", league: "Liga Profesional Argentina", logo: "https://r2.thesportsdb.com/images/media/team/badge/m5i2q21775755577.png"},
+  {name: "Banfield", league: "Liga Profesional Argentina", logo: "https://r2.thesportsdb.com/images/media/team/badge/c2ea011775756104.png"},
+  {name: "Barracas Central", league: "Liga Profesional Argentina", logo: "https://r2.thesportsdb.com/images/media/team/badge/rbkjba1707458543.png"},
+  {name: "Belgrano", league: "Liga Profesional Argentina", logo: "https://r2.thesportsdb.com/images/media/team/badge/0twgzi1517768087.png"},
+  {name: "Boca Juniors", league: "Liga Profesional Argentina", logo: "https://r2.thesportsdb.com/images/media/team/badge/bm7krb1775741582.png"},
+  {name: "Central Cordoba", league: "Liga Profesional Argentina", logo: "https://r2.thesportsdb.com/images/media/team/badge/d62xkc1576101576.png"},
+  {name: "Defensa y Justicia", league: "Liga Profesional Argentina", logo: "https://r2.thesportsdb.com/images/media/team/badge/3guvlh1775778978.png"},
+  {name: "Deportivo Riestra", league: "Liga Profesional Argentina", logo: "https://r2.thesportsdb.com/images/media/team/badge/332h0l1578824392.png"},
+  {name: "Rosario Central", league: "Liga Profesional Argentina", logo: "https://r2.thesportsdb.com/images/media/team/badge/y6q1ds1769660256.png"},
+  {name: "Racing Club", league: "Liga Profesional Argentina", logo: "https://r2.thesportsdb.com/images/media/team/badge/vi4mu41695734959.png"},
+  {name: "River Plate", league: "Liga Profesional Argentina", logo: "https://r2.thesportsdb.com/images/media/team/badge/03dmi31645539717.png"},
+  {name: "Independiente", league: "Liga Profesional Argentina", logo: "https://r2.thesportsdb.com/images/media/team/badge/eki4nd1580842605.png"},
+  {name: "San Lorenzo", league: "Liga Profesional Argentina", logo: ""},
+  {name: "Estudiantes de La Plata", league: "Liga Profesional Argentina", logo: "https://r2.thesportsdb.com/images/media/team/badge/pf08dq1760634366.png"},
+  {name: "Gimnasia La Plata", league: "Liga Profesional Argentina", logo: "https://r2.thesportsdb.com/images/media/team/badge/dtqto61775838814.png"},
+  {name: "Godoy Cruz", league: "Liga Profesional Argentina", logo: "https://r2.thesportsdb.com/images/media/team/badge/d3c0ds1517768584.png"},
+  {name: "Huracan", league: "Liga Profesional Argentina", logo: "https://r2.thesportsdb.com/images/media/team/badge/kppi2b1775776550.png"},
+  {name: "Instituto", league: "Liga Profesional Argentina", logo: "https://r2.thesportsdb.com/images/media/team/badge/jup59w1578825794.png"},
+  {name: "Lanus", league: "Liga Profesional Argentina", logo: "https://r2.thesportsdb.com/images/media/team/badge/ddty0w1769146364.png"},
+  {name: "Newells Old Boys", league: "Liga Profesional Argentina", logo: "https://r2.thesportsdb.com/images/media/team/badge/23aftf1580842633.png"},
+  {name: "Platense", league: "Liga Profesional Argentina", logo: "https://r2.thesportsdb.com/images/media/team/badge/lbs14n1769317149.png"},
+  {name: "Sarmiento", league: "Liga Profesional Argentina", logo: "https://r2.thesportsdb.com/images/media/team/badge/xxofu71677634191.png"},
+  {name: "Talleres", league: "Liga Profesional Argentina", logo: "https://r2.thesportsdb.com/images/media/team/badge/7hum2t1769310938.png"},
+  {name: "Tigre", league: "Liga Profesional Argentina", logo: "https://r2.thesportsdb.com/images/media/team/badge/krryg71765858882.png"},
+  {name: "Union Santa Fe", league: "Liga Profesional Argentina", logo: "https://r2.thesportsdb.com/images/media/team/badge/btnx6q1734587495.png"},
+  {name: "Velez Sarsfield", league: "Liga Profesional Argentina", logo: "https://r2.thesportsdb.com/images/media/team/badge/jo98m71517769587.png"},
+  {name: "Independiente Rivadavia", league: "Liga Profesional Argentina", logo: "https://r2.thesportsdb.com/images/media/team/badge/qgzi2b1769406125.png"}
 ];
 
 // Real, verified league badges pulled directly from TheSportsDB's own
@@ -293,7 +360,9 @@ const leagueLogos = {
   "Russian PL": "https://r2.thesportsdb.com/images/media/league/badge/d4yp7g1690178551.png",
   "Brasileirao": "https://r2.thesportsdb.com/images/media/league/badge/lywv7t1766787179.png",
   "Super League GR": "https://r2.thesportsdb.com/images/media/league/badge/sni7f51782459204.png",
-  "Jupiler Pro": "https://r2.thesportsdb.com/images/media/league/badge/xj8azr1786316931.png"
+  "Jupiler Pro": "https://r2.thesportsdb.com/images/media/league/badge/xj8azr1786316931.png",
+  "MLS": "https://r2.thesportsdb.com/images/media/league/badge/dqo6r91549878326.png",
+  "Liga Profesional Argentina": "https://r2.thesportsdb.com/images/media/league/badge/rk9xhx1768238251.png"
 };
 
 // Curated "marquee" clubs per league used to pick an eye-catching featured match.
@@ -377,7 +446,9 @@ const LEAGUE_IDS = {
   "Russian PL": 4355,
   "Brasileirao": 4351,
   "Super League GR": 4336,
-  "Jupiler Pro": 4338
+  "Jupiler Pro": 4338,
+  "MLS": 4346,
+  "Liga Profesional Argentina": 4406
 };
 
 function badgeImg(logo, name, cssClass) {
@@ -444,7 +515,9 @@ const LEAGUE_COUNTRY = {
   "Russian PL": "Russia",
   "Brasileirao": "Brazil",
   "Super League GR": "Greece",
-  "Jupiler Pro": "Belgium"
+  "Jupiler Pro": "Belgium",
+  "MLS": "USA/Canada",
+  "Liga Profesional Argentina": "Argentina"
 };
 
 // --- Fixtures for the currently-selected DAY, fetched live from the API,
@@ -545,6 +618,7 @@ async function fetchFixturesForWindow(centerDate) {
           date: e.dateEventLocal || e.dateEvent,
           status: e.strStatus,
           venue: e.strVenue,
+          venueId: e.idVenue,
           round: e.intRound,
           homeScore: e.intHomeScore !== null ? Number(e.intHomeScore) : null,
           awayScore: e.intAwayScore !== null ? Number(e.intAwayScore) : null,
@@ -938,7 +1012,11 @@ const matchTabCache = {};
 
 function seasonStringForLeague(league, dateStr) {
   const d = new Date(dateStr + "T00:00:00");
-  if (league === "Brasileirao") return String(d.getFullYear()); // calendar-year league
+  // Calendar-year leagues — confirmed against TheSportsDB's own
+  // strCurrentSeason for each (Brasileirao: "2026", Argentina: "2026" —
+  // despite MLS also running March-December, its own metadata reports
+  // "2026-2027", so MLS uses the default Aug-cutoff format below).
+  if (league === "Brasileirao" || league === "Liga Profesional Argentina") return String(d.getFullYear());
   const year = d.getMonth() >= 6 ? d.getFullYear() : d.getFullYear() - 1;
   return `${year}-${year + 1}`;
 }
@@ -1303,6 +1381,11 @@ function findStandingsRow(table, teamName) {
   return table.find(row => normalizeTeamName(row.team.name) === normalized || normalizeTeamName(row.team.shortName) === normalized);
 }
 
+function ordinal(n) {
+  const s = ["th", "st", "nd", "rd"], v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
+}
+
 // Appends real table-position context to a finished match's narrative —
 // "sit 2nd with 85 points", "3 points off the top" — using the standings
 // snapshot we already have for the 8 fully-covered leagues. Never guesses
@@ -1314,11 +1397,6 @@ async function appendTableContext(sentence, fixture, winnerName) {
   if (!table || table.length === 0) return sentence;
   const row = findStandingsRow(table, winnerName);
   if (!row) return sentence;
-
-  const ordinal = n => {
-    const s = ["th", "st", "nd", "rd"], v = n % 100;
-    return n + (s[(v - 20) % 10] || s[v] || s[0]);
-  };
 
   if (row.position === 1) {
     return `${sentence} ${winnerName} sit top of the table with ${row.points} points.`;
@@ -1374,13 +1452,31 @@ async function matchNarrative(fixture) {
   return `${home.name} host ${away.name}${round ? ` in Round ${round}` : ""}.`;
 }
 
+const venueCache = {};
+async function getVenueCapacity(venueId) {
+  if (!venueId) return null;
+  if (venueId in venueCache) return venueCache[venueId];
+  try {
+    const data = await fetchJsonWithRetry(`${SPORTSDB_BASE}/lookupvenue.php?id=${venueId}`);
+    const v = (data.venues || [])[0];
+    const capacity = v && v.intCapacity ? Number(v.intCapacity) : null;
+    venueCache[venueId] = capacity;
+    return capacity;
+  } catch (err) {
+    return null; // supplementary — a failed lookup just means we skip it
+  }
+}
+
 async function renderMatchInfoTab(fixture) {
-  const narrative = await matchNarrative(fixture);
+  const [narrative, capacity] = await Promise.all([
+    matchNarrative(fixture),
+    getVenueCapacity(fixture.venueId)
+  ]);
   return `
     <div class="match-narrative">${narrative}</div>
     <div class="match-info-card">
       <div class="match-info-row"><span class="match-info-icon">📅</span>${formatApiDate(fixture.date)}${fixture.time ? " · " + fixture.time : ""}</div>
-      ${fixture.venue ? `<div class="match-info-row"><span class="match-info-icon">📍</span>${fixture.venue}</div>` : ""}
+      ${fixture.venue ? `<div class="match-info-row"><span class="match-info-icon">📍</span>${fixture.venue}${capacity ? ` · Capacity ${capacity.toLocaleString()}` : ""}</div>` : ""}
       ${fixture.round ? `<div class="match-info-row"><span class="match-info-icon">🏆</span>Round ${fixture.round}</div>` : ""}
     </div>`;
 }
@@ -1557,15 +1653,54 @@ function renderH2HResultRow(teamName, r) {
     </div>`;
 }
 
+// W/D/L for a specific team from one of their own past results (as
+// returned by eventslast.php — a result already known to involve them).
+function outcomeForTeam(result, teamId) {
+  const isHome = String(result.idHomeTeam) === String(teamId);
+  const own = Number(isHome ? result.intHomeScore : result.intAwayScore);
+  const opp = Number(isHome ? result.intAwayScore : result.intHomeScore);
+  if (own > opp) return "W";
+  if (own < opp) return "L";
+  return "D";
+}
+
+async function renderFormGuide(fixture, homeResultsFull, awayResultsFull) {
+  const table = await getStandingsTable(fixture.league, fixture.date);
+  const homeResults = homeResultsFull.slice(0, 5).reverse();
+  const awayResults = awayResultsFull.slice(0, 5).reverse();
+
+  const positionTag = teamName => {
+    if (!table) return "";
+    const row = findStandingsRow(table, teamName);
+    return row ? `<span class="form-position">${ordinal(row.position)}</span>` : "";
+  };
+
+  const renderSide = (team, results) => `
+    <div class="form-side">
+      <div class="form-side-header">${badgeImg(team.logo, team.name, "")}<span>${team.name}</span>${positionTag(team.name)}</div>
+      <div class="form-badges">
+        ${results.length ? results.map(r => `<span class="form-badge form-${outcomeForTeam(r, team.id).toLowerCase()}">${outcomeForTeam(r, team.id)}</span>`).join("") : `<span class="form-badge-empty">No recent results</span>`}
+      </div>
+    </div>`;
+
+  return `
+    <div class="team-modal-section-title">Recent Form</div>
+    <div class="form-guide">
+      ${renderSide(fixture.home, homeResults)}
+      ${renderSide(fixture.away, awayResults)}
+    </div>`;
+}
+
 async function renderMatchH2HTab(fixture) {
   const [homeData, awayData] = await Promise.all([
     fetchJsonWithRetry(`${SPORTSDB_BASE}/eventslast.php?id=${fixture.home.id}`),
     fetchJsonWithRetry(`${SPORTSDB_BASE}/eventslast.php?id=${fixture.away.id}`)
   ]);
-  const homeLast = (homeData.results || [])[0];
-  const awayLast = (awayData.results || [])[0];
+  const homeResults = homeData.results || [];
+  const awayResults = awayData.results || [];
+  const formHtml = await renderFormGuide(fixture, homeResults, awayResults);
   const note = `<div class="h2h-note">Our data source doesn't provide multi-season head-to-head history — here's each team's most recent result instead.</div>`;
-  return note + renderH2HResultRow(fixture.home.name, homeLast) + renderH2HResultRow(fixture.away.name, awayLast);
+  return formHtml + note + renderH2HResultRow(fixture.home.name, homeResults[0]) + renderH2HResultRow(fixture.away.name, awayResults[0]);
 }
 
 document.getElementById("prevDay").addEventListener("click", () => changeDate(-1));
