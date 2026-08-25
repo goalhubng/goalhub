@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GoalHub — Live Football Scores</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="brand">
+      <span class="brand-badge">⚽</span>
+      <span class="brand-name">Goal<span class="accent">Hub</span></span>
+    </div>
+
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="Search teams… Arsenal, Real Madrid" oninput="searchTeams()">
+    </div>
+  </header>
+
+  <div class="main-layout">
+    <!-- LEFT SIDEBAR -->
+    <aside class="sidebar glass" id="sidebar">
+      <h3>Competitions</h3>
+      <div id="competitions"></div>
+    </aside>
+
+    <!-- CENTER -->
+    <main class="content glass">
+      <div class="date-bar">
+        <button id="prevDay" class="date-btn" aria-label="Previous day">‹</button>
+        <span class="date-label">Today</span>
+        <button id="nextDay" class="date-btn" aria-label="Next day">›</button>
+      </div>
+      <div id="matches"></div>
+    </main>
+
+    <!-- RIGHT SIDEBAR -->
+    <aside class="rightbar glass">
+      <h3>Today's Featured</h3>
+      <div id="featured"></div>
+    </aside>
+  </div>
+
+  <!-- TEAM DETAIL MODAL -->
+  <div class="team-modal" id="teamModal">
+    <div class="team-modal-backdrop" onclick="closeTeamModal()"></div>
+    <div class="team-modal-card glass">
+      <button class="team-modal-close" onclick="closeTeamModal()" aria-label="Close">&times;</button>
+      <div id="teamModalContent"></div>
+    </div>
+  </div>
+
+  <!-- MATCH DETAIL MODAL -->
+  <div class="team-modal" id="matchModal">
+    <div class="team-modal-backdrop" onclick="closeMatchModal()"></div>
+    <div class="team-modal-card glass match-modal-card">
+      <button class="team-modal-close" onclick="closeMatchModal()" aria-label="Close">&times;</button>
+      <div id="matchModalContent"></div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
