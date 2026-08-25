@@ -552,6 +552,33 @@ const matchesDiv = document.getElementById("matches");
 let activeLeague = "All";
 let searchTerm = "";
 
+// --- Favorites: real localStorage persistence, keyed by match ID. Starring
+// a match highlights it and pins it into a dedicated section at the very
+// top of the list (in addition to its normal spot in its league group),
+// for as long as that match is still in the currently-loaded window.
+const FAVORITES_KEY = "goalhub_favorite_matches";
+
+function getFavoriteIds() {
+  try {
+    return new Set(JSON.parse(localStorage.getItem(FAVORITES_KEY) || "[]"));
+  } catch (err) {
+    return new Set();
+  }
+}
+
+function isFavorited(matchId) {
+  return getFavoriteIds().has(String(matchId));
+}
+
+function toggleFavorite(matchId) {
+  const favs = getFavoriteIds();
+  const id = String(matchId);
+  if (favs.has(id)) favs.delete(id);
+  else favs.add(id);
+  localStorage.setItem(FAVORITES_KEY, JSON.stringify([...favs]));
+  loadMatches();
+}
+
 // --- Real data via TheSportsDB's public free API (key "123" is their
 // documented open test key, not a secret — meant to be used client-side).
 const SPORTSDB_KEY = "123";
@@ -824,6 +851,20 @@ function setStatusFilter(filter) {
   loadMatches();
 }
 
+function renderMatchRow(f) {
+  const status = matchStatusDisplay(f);
+  const favorited = isFavorited(f.id);
+  return `
+    <div class="match-row" onclick="openMatchModal('${f.id}')">
+      <div class="match-status">${status.primary}${status.tag ? `<span class="match-tag">${status.tag}</span>` : ""}</div>
+      <div class="match-teams">
+        ${clickableTeam(f.home)}
+        ${clickableTeam(f.away)}
+      </div>
+      <div class="fav-star${favorited ? " favorited" : ""}" onclick="event.stopPropagation(); toggleFavorite('${f.id}')">${favorited ? "★" : "☆"}</div>
+    </div>`;
+}
+
 function loadMatches() {
   let fixturesToUse = activeLeague === "All" ? currentFixtures : currentFixtures.filter(f => f.league === activeLeague);
 
@@ -862,6 +903,16 @@ function loadMatches() {
   const leaguesToShow = [...new Set(fixturesToUse.map(f => f.league))];
   let bodyHtml = "";
 
+  const favoriteFixtures = fixturesToUse.filter(f => isFavorited(f.id));
+  if (favoriteFixtures.length > 0) {
+    bodyHtml += `<div class="league-group">
+      <div class="league-title">
+        <span class="league-title-text"><span class="league-name">★ Favorites</span></span>
+      </div>
+      ${favoriteFixtures.map(renderMatchRow).join("")}
+    </div>`;
+  }
+
   leaguesToShow.forEach(league => {
     const leagueFixtures = fixturesToUse
       .filter(f => f.league === league)
@@ -878,18 +929,7 @@ function loadMatches() {
         <span class="league-table-link" onclick="event.stopPropagation(); openLeagueTableModal('${league.replace(/'/g, "")}')">Table ›</span>
       </div>`;
 
-    leagueFixtures.forEach(f => {
-      const status = matchStatusDisplay(f);
-      html += `
-      <div class="match-row" onclick="openMatchModal('${f.id}')">
-        <div class="match-status">${status.primary}${status.tag ? `<span class="match-tag">${status.tag}</span>` : ""}</div>
-        <div class="match-teams">
-          ${clickableTeam(f.home)}
-          ${clickableTeam(f.away)}
-        </div>
-        <div class="fav-star" onclick="event.stopPropagation()">☆</div>
-      </div>`;
-    });
+    html += leagueFixtures.map(renderMatchRow).join("");
     html += `</div>`;
     bodyHtml += html;
   });
@@ -1203,6 +1243,7 @@ function openMatchModal(matchId) {
       <button class="match-tab-btn active" data-tab="info" onclick="showMatchTab('info')">Info</button>
       <button class="match-tab-btn" data-tab="lineups" onclick="showMatchTab('lineups')">Line-ups</button>
       <button class="match-tab-btn" data-tab="table" onclick="showMatchTab('table')">Table</button>
+      <button class="match-tab-btn" data-tab="stats" onclick="showMatchTab('stats')">Stats</button>
       <button class="match-tab-btn" data-tab="h2h" onclick="showMatchTab('h2h')">H2H</button>
       <button class="match-tab-btn" data-tab="chat" onclick="showMatchTab('chat')">Chat</button>
       <button class="match-tab-btn" data-tab="motm" onclick="showMatchTab('motm')">MOTM</button>
@@ -1494,6 +1535,7 @@ async function showMatchTab(tab) {
     if (tab === "info") html = await renderMatchInfoTab(fixture);
     else if (tab === "lineups") html = await renderMatchLineupsTab(fixture);
     else if (tab === "table") html = await renderMatchTableTab(fixture);
+    else if (tab === "stats") html = await renderMatchStatsTab(fixture);
     else if (tab === "h2h") html = await renderMatchH2HTab(fixture);
   } catch (err) {
     // A transient fetch failure (network hiccup, shared free-key rate limit)
@@ -1793,6 +1835,40 @@ async function fetchLeagueTableHtml(league, dateStr, highlightNames) {
 
 async function renderMatchTableTab(fixture) {
   return fetchLeagueTableHtml(fixture.league, fixture.date, [fixture.home.name, fixture.away.name]);
+}
+
+// Real match statistics (shots on/off target, total shots, blocked, shots
+// inside box) — confirmed available on TheSportsDB's free tier for
+// finished/live matches. There's nothing to show pre-match, so that case
+// is handled honestly without even making the request.
+async function renderMatchStatsTab(fixture) {
+  if (!isLiveStatus(fixture.status) && !isFinishedStatus(fixture.status)) {
+    return `<div class="team-no-fixture">Stats aren't available until the match starts.</div>`;
+  }
+  const data = await fetchJsonWithRetry(`${SPORTSDB_BASE}/lookupeventstats.php?id=${fixture.id}`);
+  const stats = data.eventstats || [];
+  if (stats.length === 0) {
+    return `<div class="team-no-fixture">Stats aren't published for this match on our free data source.</div>`;
+  }
+  const rows = stats.map(s => {
+    const home = Number(s.intHome) || 0;
+    const away = Number(s.intAway) || 0;
+    const total = home + away || 1;
+    const homePct = Math.round((home / total) * 100);
+    return `
+      <div class="stat-row">
+        <div class="stat-values">
+          <span class="stat-value">${s.intHome}</span>
+          <span class="stat-label">${s.strStat}</span>
+          <span class="stat-value">${s.intAway}</span>
+        </div>
+        <div class="stat-bar-track">
+          <div class="stat-bar-home" style="width:${homePct}%"></div>
+          <div class="stat-bar-away" style="width:${100 - homePct}%"></div>
+        </div>
+      </div>`;
+  }).join("");
+  return `<div class="stats-list">${rows}</div>`;
 }
 
 function renderH2HResultRow(teamName, r) {

@@ -368,6 +368,7 @@ h3 {
 }
 
 .fav-star:hover { color: var(--accent); transform: scale(1.2); }
+.fav-star.favorited { color: var(--accent); }
 
 .status-filter-bar {
   display: flex;
@@ -1021,6 +1022,32 @@ h3 {
 .form-l { background: #ff5470; color: #2a0a10; }
 
 .form-badge-empty { font-size: 11px; color: var(--text-dim); }
+
+/* ---------- Match stats ---------- */
+
+.stats-list { display: flex; flex-direction: column; gap: 14px; }
+
+.stat-values {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.stat-value { font-weight: 800; color: var(--text); min-width: 24px; text-align: center; }
+.stat-label { color: var(--text-dim); font-size: 12px; flex: 1; text-align: center; }
+
+.stat-bar-track {
+  display: flex;
+  height: 6px;
+  border-radius: 3px;
+  overflow: hidden;
+  background: var(--panel-strong);
+}
+
+.stat-bar-home { background: var(--accent); }
+.stat-bar-away { background: var(--text-dim); }
 
 .table-header-row {
   display: grid;
