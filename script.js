@@ -800,7 +800,7 @@ async function showTeamTab(tab) {
   let html, failed = false;
   try {
     if (tab === "overview") html = await renderTeamOverviewTab(team.id, team.name);
-    else if (tab === "squad") html = await renderTeamSquadTab(team.id);
+    else if (tab === "squad") html = await renderTeamSquadTab(team.id, team.name);
   } catch (err) {
     failed = true;
     html = `<div class="no-results">Couldn't load this right now (the free API can be flaky under load). <span class="retry-link" onclick="showTeamTab('${tab}')">Tap to retry</span>.</div>`;
@@ -879,12 +879,20 @@ function squadPositionGroup(position) {
   return "Coaching Staff";
 }
 
-async function renderTeamSquadTab(teamId) {
-  let squad = teamSquadCache[teamId];
-  if (!squad) {
-    const data = await fetchJsonWithRetry(`${SPORTSDB_BASE}/lookup_all_players.php?id=${teamId}`);
-    squad = Array.isArray(data.player) ? data.player : [];
-    teamSquadCache[teamId] = squad;
+async function renderTeamSquadTab(teamId, teamName) {
+  const manual = MANUAL_SQUADS[teamName];
+  const isManual = Array.isArray(manual) && manual.length > 0;
+
+  let squad;
+  if (isManual) {
+    squad = manual.map(p => ({ strPlayer: p.name, strPosition: p.position || "", strNumber: p.number || "", strCutout: "", strThumb: "" }));
+  } else {
+    squad = teamSquadCache[teamId];
+    if (!squad) {
+      const data = await fetchJsonWithRetry(`${SPORTSDB_BASE}/lookup_all_players.php?id=${teamId}`);
+      squad = Array.isArray(data.player) ? data.player : [];
+      teamSquadCache[teamId] = squad;
+    }
   }
   if (squad.length === 0) {
     return `<div class="team-no-fixture">Squad isn't published for this team on our free data source.</div>`;
@@ -908,9 +916,9 @@ async function renderTeamSquadTab(teamId) {
       ${list.map(renderPlayer).join("")}`)
     .join("");
 
-  // The free tier only ever surfaces ~10 entries total for a team (players
-  // and staff mixed together) — nowhere near a full ~25-player squad. Say
-  // so rather than presenting a handful of names as the whole roster.
+  // A manually-entered squad is presumed complete — only show the "partial
+  // data" note when we're falling back to the free tier's ~10-entry list.
+  if (isManual) return sections;
   return `
     <div class="h2h-note">Our free data source only has a partial squad list for this team — not the full roster.</div>
     ${sections}`;
@@ -1457,8 +1465,40 @@ async function fetchFullStandingsHtml(league, dateStr, highlightNames) {
     <div class="table-rows">${rows}</div>`;
 }
 
+function renderManualStandingsHtml(rows, highlightNames) {
+  const body = rows.map(row => {
+    const isHighlighted = highlightNames.includes(row.team);
+    return `
+      <div class="table-row full${isHighlighted ? " table-row-highlight" : ""}">
+        <span class="table-rank">${row.pos}</span>
+        <span class="table-team">${badgeImg(resolveLogo("", row.team), row.team, "")}${row.team}</span>
+        <span class="table-stat">${row.p}</span>
+        <span class="table-stat">${row.w}</span>
+        <span class="table-stat">${row.d}</span>
+        <span class="table-stat">${row.l}</span>
+        <span class="table-stat">${row.gd}</span>
+        <span class="table-stat table-pts">${row.pts}</span>
+      </div>`;
+  }).join("");
+  return `
+    <div class="table-header-row full">
+      <span class="table-rank">#</span>
+      <span class="table-team">Team</span>
+      <span class="table-stat">P</span>
+      <span class="table-stat">W</span>
+      <span class="table-stat">D</span>
+      <span class="table-stat">L</span>
+      <span class="table-stat">GD</span>
+      <span class="table-stat table-pts">Pts</span>
+    </div>
+    <div class="table-rows">${body}</div>`;
+}
+
 async function fetchLeagueTableHtml(league, dateStr, highlightNames) {
   if (STANDINGS_LEAGUES[league]) return fetchFullStandingsHtml(league, dateStr, highlightNames);
+  if (MANUAL_STANDINGS[league] && MANUAL_STANDINGS[league].length > 0) {
+    return renderManualStandingsHtml(MANUAL_STANDINGS[league], highlightNames);
+  }
   const leagueId = LEAGUE_IDS[league];
   const season = seasonStringForLeague(league, dateStr);
   const data = await fetchJsonWithRetry(`${SPORTSDB_BASE}/lookuptable.php?l=${leagueId}&s=${season}`);
