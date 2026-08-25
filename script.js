@@ -702,7 +702,7 @@ function toggleMoreLeagues() {
 // --- Today's Featured: highlights one of the currently-loaded real
 // fixtures, preferring a marquee matchup, so it always reflects an actual
 // game from the list rendered below (never an invented one).
-function renderFeaturedMatch() {
+async function renderFeaturedMatch() {
   const featuredDiv = document.getElementById("featured");
   if (currentFixtures.length === 0) {
     featuredDiv.innerHTML = `<div class="team-no-fixture">No fixtures for ${windowLabel(currentDate)}.</div>`;
@@ -718,6 +718,7 @@ function renderFeaturedMatch() {
   const fixture = pool[0];
   const { home, away, league } = fixture;
   const status = matchStatusDisplay(fixture);
+  const narrative = await matchNarrative(fixture);
 
   featuredDiv.innerHTML = `
     <div class="featured-card">
@@ -734,7 +735,7 @@ function renderFeaturedMatch() {
         </div>
       </div>
       <div class="featured-meta">${league_icon(league)}<strong>${league}</strong> · ${status.primary}</div>
-      <div class="featured-narrative">${matchNarrative(fixture)}</div>
+      <div class="featured-narrative">${narrative}</div>
     </div>`;
 }
 
@@ -1246,7 +1247,7 @@ async function showMatchTab(tab) {
 
   let html, failed = false;
   try {
-    if (tab === "info") html = renderMatchInfoTab(fixture);
+    if (tab === "info") html = await renderMatchInfoTab(fixture);
     else if (tab === "lineups") html = await renderMatchLineupsTab(fixture);
     else if (tab === "table") html = await renderMatchTableTab(fixture);
     else if (tab === "h2h") html = await renderMatchH2HTab(fixture);
@@ -1268,13 +1269,68 @@ async function showMatchTab(tab) {
   }
 }
 
+// Cache of standings tables keyed by "league|season", reused by both the
+// Table tab and this narrative context so a finished-match sentence doesn't
+// trigger its own redundant fetch on top of one the Table tab already made.
+const standingsTableCache = {};
+
+async function getStandingsTable(league, dateStr) {
+  const competition = STANDINGS_LEAGUES[league];
+  if (!competition) return null; // only the 8 leagues with full (non-partial) standings
+  const season = seasonStringForLeague(league, dateStr).split("-")[0];
+  const cacheKey = `${league}|${season}`;
+  if (standingsTableCache[cacheKey]) return standingsTableCache[cacheKey];
+  try {
+    const data = await fetchJsonWithRetry(`${CHAT_WORKER_BASE}/standings?competition=${competition}&season=${season}`);
+    const table = data.table || [];
+    standingsTableCache[cacheKey] = table;
+    return table;
+  } catch (err) {
+    return null; // supplementary context — a failed fetch just means we skip it
+  }
+}
+
+function findStandingsRow(table, teamName) {
+  const normalized = normalizeTeamName(teamName);
+  return table.find(row => normalizeTeamName(row.team.name) === normalized || normalizeTeamName(row.team.shortName) === normalized);
+}
+
+// Appends real table-position context to a finished match's narrative —
+// "sit 2nd with 85 points", "3 points off the top" — using the standings
+// snapshot we already have for the 8 fully-covered leagues. Never guesses
+// at a position; if the team isn't found in that snapshot (name mismatch,
+// fetch failure, uncovered league) it silently adds nothing rather than
+// fabricating a league position.
+async function appendTableContext(sentence, fixture, winnerName) {
+  const table = await getStandingsTable(fixture.league, fixture.date);
+  if (!table || table.length === 0) return sentence;
+  const row = findStandingsRow(table, winnerName);
+  if (!row) return sentence;
+
+  const ordinal = n => {
+    const s = ["th", "st", "nd", "rd"], v = n % 100;
+    return n + (s[(v - 20) % 10] || s[v] || s[0]);
+  };
+
+  if (row.position === 1) {
+    return `${sentence} ${winnerName} sit top of the table with ${row.points} points.`;
+  }
+  const leaderPoints = table[0].points;
+  const gap = leaderPoints - row.points;
+  const gapPhrase = gap === 0
+    ? "level on points with the top of the table"
+    : `${gap} point${gap === 1 ? "" : "s"} off the top`;
+  return `${sentence} ${winnerName} sit ${ordinal(row.position)} with ${row.points} points, ${gapPhrase}.`;
+}
+
 // Rule-based match narrative — a plain-English sentence built only from
-// data we actually have (score, status, round). Not an AI call, and not
-// guessing at events we can't see: TheSportsDB's free tier gives us no
-// half-time score or goal/card timeline, so this deliberately never claims
-// a "comeback" or a "red card changes everything" — only what the final
-// or current scoreline actually tells us.
-function matchNarrative(fixture) {
+// data we actually have (score, status, round, and — for finished matches
+// in leagues with full standings — current table position). Not an AI
+// call, and not guessing at events we can't see: TheSportsDB's free tier
+// gives us no half-time score or goal/card timeline, so this deliberately
+// never claims a "comeback" or a "red card changes everything" — only what
+// the final or current scoreline (and real standings) actually tell us.
+async function matchNarrative(fixture) {
   const { home, away, homeScore, awayScore, status, round } = fixture;
   const hasScore = homeScore !== null && homeScore !== undefined && awayScore !== null && awayScore !== undefined;
 
@@ -1288,9 +1344,11 @@ function matchNarrative(fixture) {
     const margin = Math.abs(homeScore - awayScore);
     const winner = homeScore > awayScore ? home.name : away.name;
     const loser = homeScore > awayScore ? away.name : home.name;
-    if (margin >= 3) return `${winner} thrashed ${loser} ${scoreline}.`;
-    if (margin === 2) return `${winner} beat ${loser} comfortably, ${scoreline}.`;
-    return `${winner} edged past ${loser} ${scoreline}.`;
+    let sentence;
+    if (margin >= 3) sentence = `${winner} thrashed ${loser} ${scoreline}.`;
+    else if (margin === 2) sentence = `${winner} beat ${loser} comfortably, ${scoreline}.`;
+    else sentence = `${winner} edged past ${loser} ${scoreline}.`;
+    return appendTableContext(sentence, fixture, winner);
   }
 
   if (isLiveStatus(status) && hasScore) {
@@ -1308,9 +1366,10 @@ function matchNarrative(fixture) {
   return `${home.name} host ${away.name}${round ? ` in Round ${round}` : ""}.`;
 }
 
-function renderMatchInfoTab(fixture) {
+async function renderMatchInfoTab(fixture) {
+  const narrative = await matchNarrative(fixture);
   return `
-    <div class="match-narrative">${matchNarrative(fixture)}</div>
+    <div class="match-narrative">${narrative}</div>
     <div class="match-info-card">
       <div class="match-info-row"><span class="match-info-icon">📅</span>${formatApiDate(fixture.date)}${fixture.time ? " · " + fixture.time : ""}</div>
       ${fixture.venue ? `<div class="match-info-row"><span class="match-info-icon">📍</span>${fixture.venue}</div>` : ""}
@@ -1356,7 +1415,7 @@ async function renderMatchLineupsTab(fixture) {
 function normalizeTeamName(name) {
   return (name || "")
     .toLowerCase()
-    .replace(/\b(fc|cf|afc|sc|cd|ac)\b/g, "")
+    .replace(/\b(fc|cf|afc|sc|cd|ac|and)\b/g, "")
     .replace(/[^a-z0-9]/g, "")
     .trim();
 }
