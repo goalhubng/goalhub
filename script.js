@@ -1111,7 +1111,11 @@ function loadMatches() {
     const retryHint = searchTerm || statusFilter !== "all"
       ? ""
       : ` If that seems wrong, <span class="retry-link" onclick="loadFixturesAndRender()">tap to retry</span> — the free API can occasionally miss a request.`;
-    matchesDiv.innerHTML = filterBar + `<div class="no-results">No real fixtures for ${label}${searchTerm ? " matching your search" : statusFilter !== "all" ? ` in "${statusFilter}"` : ""}. Try another ${statusFilter !== "all" ? "filter" : "day"}.${retryHint}</div>`;
+    // Naming the active league makes it clear this is a real gap in that
+    // competition's schedule (leagues don't play every day) rather than a
+    // broken app — without it, an empty result reads as a bug.
+    const scopeLabel = activeLeague !== "All" ? activeLeague : "real";
+    matchesDiv.innerHTML = filterBar + `<div class="no-results">No ${scopeLabel} fixtures for ${label}${searchTerm ? " matching your search" : statusFilter !== "all" ? ` in "${statusFilter}"` : ""}. Try another ${statusFilter !== "all" ? "filter" : "day"}.${retryHint}</div>`;
     return;
   }
 
