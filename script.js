@@ -1155,7 +1155,8 @@ async function initAuth() {
   currentUser = fromCallback || await getCurrentUser();
   renderAuthArea();
   if (currentUser) {
-    await Promise.all([fetchServerFavorites(), fetchMyPredictions()]);
+    await Promise.all([fetchServerFavorites(), fetchMyPredictions(), fetchNotifyPrefs()]);
+    renderLiveNowSection();
     if (viewMode === "favorites" || viewMode === "teams") renderAllTeams();
     else if (viewMode === "matches") loadMatches();
   }
@@ -1523,10 +1524,33 @@ async function toggleNotifyMe(fixtureId) {
     }
     if (Notification.permission !== "granted") return;
     notifyMeFixtures.add(fixtureId);
+    if (currentUser) {
+      fetch(`${CHAT_WORKER_BASE}/api/user/notify-prefs`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${getAuthToken()}` },
+        body: JSON.stringify({ fixture_id: fixtureId })
+      }).catch(() => {}); // best-effort sync — the in-tab watch still works locally either way
+    }
   } else {
     notifyMeFixtures.delete(fixtureId);
+    if (currentUser) {
+      fetch(`${CHAT_WORKER_BASE}/api/user/notify-prefs/${fixtureId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${getAuthToken()}` }
+      }).catch(() => {});
+    }
   }
   renderLiveNowSection();
+}
+
+async function fetchNotifyPrefs() {
+  if (!currentUser) return;
+  try {
+    const res = await fetch(`${CHAT_WORKER_BASE}/api/user/notify-prefs`, { headers: { Authorization: `Bearer ${getAuthToken()}` } });
+    if (!res.ok) return;
+    const data = await res.json();
+    (data.fixtureIds || []).forEach(id => notifyMeFixtures.add(id));
+  } catch (err) { /* non-critical — bells just won't be pre-checked this load */ }
 }
 
 function scheduleGoalWatch() {
@@ -1828,6 +1852,15 @@ function loadMatches() {
   else if (statusFilter === "upcoming") fixturesToUse = fixturesToUse.filter(f => f.status === "NS" || !f.status);
 
   if (fixturesToUse.length === 0) {
+    // The Live filter is scoped to GoalHub's ~40 tracked leagues for the
+    // selected day — genuinely different from the Live Now widget above,
+    // which shows live matches from anywhere. Spelling that out here (with
+    // a way to jump there) avoids it reading as a bug when the two disagree.
+    if (statusFilter === "live" && searchTerm === "" && activeLeague === "All") {
+      matchesDiv.innerHTML = filterBar + `<div class="no-results">No live matches in Top 40 Leagues right now. Check "Live Now" for all games.<br><span class="retry-link" onclick="document.getElementById('liveNowSection').scrollIntoView({behavior:'smooth'})">View All Live Games</span></div>`;
+      return;
+    }
+
     const label = document.querySelector(".date-label").textContent;
     // We can't always tell "genuinely no games that day" apart from "the
     // free API had a silent hiccup and returned nothing" — so when there's
@@ -2080,25 +2113,46 @@ function renderMyPredictionsView() {
     </div>`;
 }
 
+// Country names for the small set of ISO codes likely to show up here —
+// falls back to the raw code (still real, just less friendly) for anything
+// not in this list rather than guessing a name.
+const COUNTRY_NAMES = {
+  NG: "Nigeria", US: "the United States", GB: "the UK", CA: "Canada", GH: "Ghana",
+  KE: "Kenya", ZA: "South Africa", IN: "India", DE: "Germany", FR: "France",
+  ES: "Spain", IT: "Italy", BR: "Brazil", AR: "Argentina", NL: "Netherlands",
+  EG: "Egypt", MA: "Morocco", AE: "the UAE", SA: "Saudi Arabia", AU: "Australia"
+};
+
 async function renderLeaderboard() {
   matchesDiv.innerHTML = skeletonRows(5);
-  let leaderboard;
+  let leaderboard, me;
   try {
-    const res = await fetch(`${CHAT_WORKER_BASE}/api/predictions/leaderboard`);
+    const headers = currentUser ? { Authorization: `Bearer ${getAuthToken()}` } : {};
+    const res = await fetch(`${CHAT_WORKER_BASE}/api/predictions/leaderboard`, { headers });
     if (!res.ok) throw new Error("bad response");
     const data = await res.json();
     leaderboard = data.leaderboard || [];
+    me = data.me;
   } catch (err) {
     matchesDiv.innerHTML = `<div class="no-results">Couldn't load the leaderboard right now. <span class="retry-link" onclick="renderLeaderboard()">Tap to retry</span>.</div>`;
     return;
   }
 
+  let meBanner = "";
+  if (me) {
+    const countryName = me.country ? (COUNTRY_NAMES[me.country] || me.country) : null;
+    const parts = [];
+    parts.push(me.rank ? `You're #${me.rank} overall this week` : "You haven't scored any predictions this week yet");
+    if (me.countryRank) parts.push(`#${me.countryRank} in ${countryName}`);
+    meBanner = `<div class="leaderboard-me-banner">${parts.join(" · ")}</div>`;
+  }
+
   if (leaderboard.length === 0) {
-    matchesDiv.innerHTML = `<div class="no-results">No scored predictions yet this week. Predict an upcoming match to get on the board.</div>`;
+    matchesDiv.innerHTML = meBanner + `<div class="no-results">No scored predictions yet this week. Predict an upcoming match to get on the board.</div>`;
     return;
   }
 
-  matchesDiv.innerHTML = `
+  matchesDiv.innerHTML = meBanner + `
     <div class="leaderboard-list">
       ${leaderboard.map((row, i) => `
         <div class="leaderboard-row${i < 3 ? " leaderboard-top3" : ""}">
@@ -3341,3 +3395,16 @@ const scrollFadeObserver = new IntersectionObserver(entries => {
 
 document.querySelectorAll(".hero-section, .live-now-section, .top-leagues-section, .main-layout")
   .forEach(el => { el.classList.add("scroll-fade"); scrollFadeObserver.observe(el); });
+
+// --- Auto-refresh for "All Matches": currentFixtures is otherwise only
+// fetched once per page load / date change, so a match that goes from
+// kickoff to live (score, minute, status all changing) just sits stale
+// until something re-triggers a fetch. Refresh the whole set periodically,
+// but only while a live match is actually present in the current view —
+// no reason to spend the shared free key's quota polling an all-finished
+// or all-upcoming day.
+setInterval(() => {
+  if (fixturesLoading) return;
+  const hasLive = currentFixtures.some(f => isLiveStatus(f.status));
+  if (hasLive) loadFixturesAndRender();
+}, 60000);

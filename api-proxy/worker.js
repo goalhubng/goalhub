@@ -239,7 +239,7 @@ async function sendMagicLinkEmail(env, toEmail, magicLink) {
   }
 }
 
-async function handleVerify(url, env) {
+async function handleVerify(request, url, env) {
   const token = url.searchParams.get("token");
   if (!token) return jsonResponse({ error: "missing token" }, 400);
 
@@ -255,14 +255,22 @@ async function handleVerify(url, env) {
 
   await env.goalhub_db.prepare("UPDATE magic_links SET used = 1 WHERE token = ?").bind(token).run();
 
+  // request.cf.country is Cloudflare's own edge geolocation of this request
+  // (a real two-letter country code) — the only country signal used
+  // anywhere in GoalHub, never asked for or guessed. Refreshed on every
+  // login so it stays roughly current if someone moves.
+  const country = (request.cf && request.cf.country) || null;
+
   let user = await env.goalhub_db.prepare("SELECT * FROM users WHERE email = ?").bind(link.email).first();
   if (!user) {
     await env.goalhub_db
-      .prepare("INSERT INTO users (email, created_at) VALUES (?, ?)")
-      .bind(link.email, now)
+      .prepare("INSERT INTO users (email, created_at, country) VALUES (?, ?, ?)")
+      .bind(link.email, now, country)
       .run();
-    user = await env.goalhub_db.prepare("SELECT * FROM users WHERE email = ?").bind(link.email).first();
+  } else if (country) {
+    await env.goalhub_db.prepare("UPDATE users SET country = ? WHERE id = ?").bind(country, user.id).run();
   }
+  user = await env.goalhub_db.prepare("SELECT * FROM users WHERE email = ?").bind(link.email).first();
 
   const sessionId = randomToken();
   const expiresAt = now + JWT_TTL_SECONDS;
@@ -300,7 +308,7 @@ async function authenticate(request, env) {
 async function handleMe(request, env) {
   const user = await authenticate(request, env);
   if (!user) return jsonResponse({ error: "unauthorized" }, 401);
-  return jsonResponse({ user: { id: user.id, email: user.email, createdAt: user.created_at } });
+  return jsonResponse({ user: { id: user.id, email: user.email, createdAt: user.created_at, country: user.country } });
 }
 
 // --- Server-side favorite teams, synced across devices for signed-in users.
@@ -363,6 +371,46 @@ async function handleDeleteFavorite(request, env, favoriteId) {
     .run();
 
   if (result.meta.changes === 0) return jsonResponse({ error: "not found" }, 404);
+  return jsonResponse({ ok: true });
+}
+
+// --- Notify-me preferences (which live fixtures a user has goal alerts on
+// for), synced across devices/sessions the same way favorites are.
+async function handleGetNotifyPrefs(request, env) {
+  const user = await authenticate(request, env);
+  if (!user) return jsonResponse({ error: "unauthorized" }, 401);
+  const { results } = await env.goalhub_db
+    .prepare("SELECT fixture_id FROM notify_preferences WHERE user_id = ?")
+    .bind(user.id)
+    .all();
+  return jsonResponse({ fixtureIds: results.map(r => r.fixture_id) });
+}
+
+async function handlePostNotifyPref(request, env) {
+  const user = await authenticate(request, env);
+  if (!user) return jsonResponse({ error: "unauthorized" }, 401);
+  let body;
+  try {
+    body = await request.json();
+  } catch (err) {
+    return jsonResponse({ error: "invalid JSON body" }, 400);
+  }
+  const fixtureId = String(body.fixture_id || "").trim();
+  if (!fixtureId) return jsonResponse({ error: "fixture_id is required" }, 400);
+  await env.goalhub_db
+    .prepare("INSERT INTO notify_preferences (user_id, fixture_id, created_at) VALUES (?, ?, ?) ON CONFLICT(user_id, fixture_id) DO NOTHING")
+    .bind(user.id, fixtureId, Math.floor(Date.now() / 1000))
+    .run();
+  return jsonResponse({ ok: true }, 201);
+}
+
+async function handleDeleteNotifyPref(request, env, fixtureId) {
+  const user = await authenticate(request, env);
+  if (!user) return jsonResponse({ error: "unauthorized" }, 401);
+  await env.goalhub_db
+    .prepare("DELETE FROM notify_preferences WHERE user_id = ? AND fixture_id = ?")
+    .bind(user.id, fixtureId)
+    .run();
   return jsonResponse({ ok: true });
 }
 
@@ -471,24 +519,54 @@ async function resolveDuePredictions(env) {
   }
 }
 
-async function handleLeaderboard(env) {
+// Calendar week (Monday 00:00 UTC), not a rolling 7-day window — a real
+// weekly reset rather than a slow drift, so "this week" means the same
+// thing to everyone checking at the same time.
+function currentWeekStartUnix() {
+  const now = new Date();
+  const day = now.getUTCDay(); // 0=Sun..6=Sat
+  const daysSinceMonday = (day + 6) % 7;
+  const monday = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - daysSinceMonday));
+  return Math.floor(monday.getTime() / 1000);
+}
+
+async function handleLeaderboard(request, env) {
   await resolveDuePredictions(env);
 
-  const weekAgo = Math.floor(Date.now() / 1000) - 7 * 24 * 60 * 60;
-  const { results } = await env.goalhub_db
+  const weekStart = currentWeekStartUnix();
+  const { results: allScored } = await env.goalhub_db
     .prepare(
-      `SELECT u.email as email, SUM(p.points) as total_points, COUNT(*) as predictions_made
+      `SELECT p.user_id as userId, u.email as email, u.country as country,
+              SUM(p.points) as total_points, COUNT(*) as predictions_made
        FROM predictions p
        JOIN users u ON u.id = p.user_id
        WHERE p.resolved = 1 AND p.created_at >= ?
        GROUP BY p.user_id
-       ORDER BY total_points DESC
-       LIMIT 20`
+       ORDER BY total_points DESC`
     )
-    .bind(weekAgo)
+    .bind(weekStart)
     .all();
 
-  return jsonResponse({ leaderboard: results });
+  const leaderboard = allScored.slice(0, 20).map(({ email, total_points, predictions_made }) => ({ email, total_points, predictions_made }));
+
+  // "You are #42 in Nigeria" — only computed for the requesting user, and
+  // only using their real Cloudflare-geolocated country (see handleVerify),
+  // never asked for or guessed.
+  let me = null;
+  const user = await authenticate(request, env).catch(() => null);
+  if (user) {
+    const overallIndex = allScored.findIndex(r => r.userId === user.id);
+    const countryScored = user.country ? allScored.filter(r => r.country === user.country) : [];
+    const countryIndex = user.country ? countryScored.findIndex(r => r.userId === user.id) : -1;
+    me = {
+      rank: overallIndex === -1 ? null : overallIndex + 1,
+      points: overallIndex === -1 ? 0 : allScored[overallIndex].total_points,
+      country: user.country || null,
+      countryRank: countryIndex === -1 ? null : countryIndex + 1
+    };
+  }
+
+  return jsonResponse({ leaderboard, me, weekStart });
 }
 
 // --- Per-match chat + score-prediction room. One DO instance per match ID
@@ -629,7 +707,7 @@ export default {
     ) {
       try {
         if (url.pathname === "/api/auth/send-magic-link") return await handleSendMagicLink(request, env);
-        if (url.pathname === "/api/auth/verify") return await handleVerify(url, env);
+        if (url.pathname === "/api/auth/verify") return await handleVerify(request, url, env);
         return await handleMe(request, env);
       } catch (err) {
         return jsonResponse({ error: "internal error" }, 500);
@@ -650,11 +728,25 @@ export default {
       }
     }
 
+    if (url.pathname === "/api/user/notify-prefs" || url.pathname.startsWith("/api/user/notify-prefs/")) {
+      try {
+        if (url.pathname === "/api/user/notify-prefs" && request.method === "GET") return await handleGetNotifyPrefs(request, env);
+        if (url.pathname === "/api/user/notify-prefs" && request.method === "POST") return await handlePostNotifyPref(request, env);
+        if (request.method === "DELETE") {
+          const fixtureId = url.pathname.slice("/api/user/notify-prefs/".length);
+          return await handleDeleteNotifyPref(request, env, fixtureId);
+        }
+        return jsonResponse({ error: "unknown endpoint" }, 404);
+      } catch (err) {
+        return jsonResponse({ error: "internal error" }, 500);
+      }
+    }
+
     if (url.pathname === "/api/predictions/submit" || url.pathname === "/api/predictions/mine" || url.pathname === "/api/predictions/leaderboard") {
       try {
         if (url.pathname === "/api/predictions/submit" && request.method === "POST") return await handleSubmitPrediction(request, env);
         if (url.pathname === "/api/predictions/mine" && request.method === "GET") return await handleMyPredictions(request, env);
-        if (url.pathname === "/api/predictions/leaderboard" && request.method === "GET") return await handleLeaderboard(env);
+        if (url.pathname === "/api/predictions/leaderboard" && request.method === "GET") return await handleLeaderboard(request, env);
         return jsonResponse({ error: "unknown endpoint" }, 404);
       } catch (err) {
         return jsonResponse({ error: "internal error" }, 500);
@@ -772,11 +864,15 @@ export default {
       return jsonResponse({ error: err.message }, 502);
     }
 
-    // Cache each unique request at Cloudflare's edge for 2 minutes — long
-    // enough to absorb a burst of visitors hitting the same day/team without
-    // spending API-Football quota on every single page load, short enough
-    // that scores don't go stale during a live match.
-    const response = jsonResponse(payload, 200, { "Cache-Control": "public, max-age=120" });
+    // Cache each unique request at Cloudflare's edge — long enough (2 min)
+    // to absorb a burst of visitors hitting the same day/team without
+    // spending API-Football quota on every page load, for routes where that
+    // staleness doesn't matter. /live-fixtures is explicitly "right now" —
+    // 2 minutes there means a goal or a match starting/ending can sit stale
+    // on the homepage for up to 2 minutes, which defeats the point of a
+    // pulsing "Live Now" indicator — so it gets a much shorter 20s window.
+    const cacheMaxAge = url.pathname === "/live-fixtures" ? 20 : 120;
+    const response = jsonResponse(payload, 200, { "Cache-Control": `public, max-age=${cacheMaxAge}` });
     ctx.waitUntil(cache.put(cacheKey, response.clone()));
     return response;
   }

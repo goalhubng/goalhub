@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GoalHub Live Scores Widget</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #0a0f0c;
+    color: #f4f4f5;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+  }
+  .widget { padding: 12px; }
+  .widget-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 12px;
+    font-weight: 800;
+  }
+  .widget-header a { color: #22c55e; text-decoration: none; }
+  .live-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #ff5470; display: inline-block; margin-right: 5px;
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+  .match-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 10px;
+    margin-bottom: 6px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    font-size: 12px;
+  }
+  .teams { display: flex; flex-direction: column; gap: 2px; font-weight: 600; }
+  .score { font-weight: 800; color: #22c55e; text-align: right; }
+  .minute { font-size: 10px; color: #ff5470; text-align: right; }
+  .empty { padding: 20px 10px; text-align: center; color: #8b96a3; font-size: 12px; }
+</style>
+</head>
+<body>
+  <div class="widget">
+    <div class="widget-header">
+      <span><span class="live-dot"></span>LIVE ON GOALHUB</span>
+      <a href="https://goalhub.pages.dev" target="_blank" rel="noopener">goalhub.pages.dev →</a>
+    </div>
+    <div id="widgetMatches">Loading…</div>
+  </div>
+
+  <script>
+    const WORKER_BASE = "https://goalhub-api-proxy.betterdays-goalhub.workers.dev";
+
+    async function loadWidget() {
+      const el = document.getElementById("widgetMatches");
+      try {
+        const res = await fetch(`${WORKER_BASE}/live-fixtures`);
+        const data = await res.json();
+        const fixtures = data.fixtures || [];
+        if (fixtures.length === 0) {
+          el.innerHTML = `<div class="empty">No live matches right now.</div>`;
+          return;
+        }
+        el.innerHTML = fixtures.map(f => `
+          <div class="match-row">
+            <div class="teams">
+              <span>${f.home.name}</span>
+              <span>${f.away.name}</span>
+            </div>
+            <div>
+              <div class="score">${f.home.score ?? 0} - ${f.away.score ?? 0}</div>
+              <div class="minute">${f.minute != null ? f.minute + "'" : f.statusShort}</div>
+            </div>
+          </div>`).join("");
+      } catch (err) {
+        el.innerHTML = `<div class="empty">Couldn't load live scores right now.</div>`;
+      }
+    }
+
+    loadWidget();
+    setInterval(loadWidget, 20000); // matches the Worker's 20s cache window
+  </script>
+</body>
+</html>
