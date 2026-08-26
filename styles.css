@@ -1,10 +1,10 @@
 :root {
   --bg: #06080b;
-  --panel: rgba(255, 255, 255, 0.045);
-  --panel-strong: rgba(255, 255, 255, 0.07);
-  --border: rgba(255, 255, 255, 0.09);
-  --border-soft: rgba(255, 255, 255, 0.06);
-  --text: #f2f5f7;
+  --panel: rgba(24, 24, 27, 0.6);
+  --panel-strong: rgba(39, 39, 42, 0.7);
+  --border: rgba(63, 63, 70, 0.6);
+  --border-soft: rgba(63, 63, 70, 0.35);
+  --text: #f4f4f5;
   --text-dim: #8b96a3;
   --accent: #22c55e;
   --accent-dim: rgba(34, 197, 94, 0.14);
@@ -300,7 +300,6 @@ body::after {
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   padding: 18px;
-  cursor: pointer;
 }
 
 .live-game-league {
@@ -311,6 +310,18 @@ body::after {
   color: var(--text-dim);
   font-weight: 700;
   margin-bottom: 14px;
+}
+
+.live-badge {
+  margin-left: auto;
+  background: #ff5470;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .5px;
+  padding: 3px 7px;
+  border-radius: 999px;
+  animation: live-pulse 1.6s ease-in-out infinite;
 }
 
 .live-game-league img { width: 14px; height: 14px; object-fit: contain; border-radius: 3px; }
@@ -420,7 +431,7 @@ body::after {
   transition: background .15s ease, border-color .15s ease, color .15s ease;
 }
 
-.auth-btn:hover { background: var(--accent-dim); border-color: var(--accent); }
+.auth-btn:hover { background: var(--accent-dim); border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent-glow), 0 4px 16px rgba(34, 197, 94, 0.2); }
 
 .auth-btn.logged-in { color: var(--accent); border-color: var(--accent); }
 
@@ -545,6 +556,7 @@ h3 {
   background: var(--panel-strong);
   color: var(--text);
   transform: translateX(2px);
+  box-shadow: -3px 0 12px -2px var(--accent-glow);
 }
 
 .comp-item.active {

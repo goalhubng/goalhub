@@ -550,6 +550,28 @@ export default {
           apiFootballFetch(env, `/fixtures?team=${teamId}&next=1`)
         ]);
         payload = { last: last.response || [], next: next.response || [] };
+      } else if (url.pathname === "/live-fixtures") {
+        // Homepage "Live Now" grid. Prefers matches from GoalHub's own
+        // tracked top leagues (LEAGUE_IDS above) so the grid shows
+        // recognizable football first, falling back to any live match
+        // to fill out to 6 if fewer than 6 of those are live right now.
+        const data = await apiFootballFetch(env, "/fixtures?live=all");
+        const all = data.response || [];
+        const trackedLeagueIds = new Set(Object.values(LEAGUE_IDS));
+        const tracked = all.filter(f => trackedLeagueIds.has(f.league.id));
+        const rest = all.filter(f => !trackedLeagueIds.has(f.league.id));
+        const chosen = [...tracked, ...rest].slice(0, 6);
+        payload = {
+          fixtures: chosen.map(f => ({
+            id: f.fixture.id,
+            league: f.league.name,
+            leagueLogo: f.league.logo,
+            minute: f.fixture.status.elapsed,
+            statusShort: f.fixture.status.short,
+            home: { name: f.teams.home.name, logo: f.teams.home.logo, score: f.goals.home },
+            away: { name: f.teams.away.name, logo: f.teams.away.logo, score: f.goals.away }
+          }))
+        };
       } else if (url.pathname === "/team-search") {
         const name = url.searchParams.get("name");
         if (!name) return jsonResponse({ error: "missing name" }, 400);

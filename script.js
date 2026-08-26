@@ -1439,37 +1439,56 @@ async function loadFixturesAndRender() {
   }
   loadMatches();
   renderFeaturedMatch();
-  renderLiveNowSection();
 }
 
 // --- Live Now (hero grid) — always the real live fixtures already loaded
 // for today, never mock data. An honest empty state when nothing's live
 // right now, rather than padding the grid with anything fake.
-function renderLiveNowSection() {
+const AF_IN_PROGRESS_STATUSES = new Set(["1H", "2H", "HT", "ET", "BT", "P", "LIVE"]);
+
+function afMinuteLabel(f) {
+  if (f.statusShort === "HT") return "HT";
+  if (f.statusShort === "FT") return "FT";
+  if (f.statusShort === "NS") return "Not started";
+  return f.minute != null ? `${f.minute}'` : f.statusShort;
+}
+
+// Homepage "Live Now" — real fixtures from API-Football (via the Worker's
+// /live-fixtures route), independent of the date bar since "live" always
+// means right now regardless of which day is selected below.
+async function renderLiveNowSection() {
   const grid = document.getElementById("liveNowGrid");
-  const live = currentFixtures.filter(f => isLiveStatus(f.status)).slice(0, 6);
+  let fixtures;
+  try {
+    const res = await fetch(`${CHAT_WORKER_BASE}/live-fixtures`);
+    if (!res.ok) throw new Error("bad response");
+    const data = await res.json();
+    fixtures = data.fixtures || [];
+  } catch (err) {
+    grid.innerHTML = `<div class="live-now-empty">Couldn't load live matches right now. <span class="retry-link" onclick="renderLiveNowSection()">Tap to retry</span>.</div>`;
+    return;
+  }
+
+  const live = fixtures.filter(f => AF_IN_PROGRESS_STATUSES.has(f.statusShort));
 
   if (live.length === 0) {
     grid.innerHTML = `<div class="live-now-empty">No live matches right now. Check back during a matchday, or browse today's fixtures below.</div>`;
     return;
   }
 
-  grid.innerHTML = live.map(f => {
-    const status = matchStatusDisplay(f);
-    return `
-      <div class="live-game-card hover-glow" onclick="openMatchModal('${f.id}')">
-        <div class="live-game-league">${badgeImg(leagueLogos[f.league], f.league, "")}<span>${f.league}</span></div>
-        <div class="live-game-row">
-          <div class="live-game-team">${badgeImg(f.home.logo, f.home.name, "")}<span>${f.home.name}</span></div>
-          <div class="live-game-score">${f.homeScore ?? 0}</div>
-        </div>
-        <div class="live-game-row">
-          <div class="live-game-team">${badgeImg(f.away.logo, f.away.name, "")}<span>${f.away.name}</span></div>
-          <div class="live-game-score">${f.awayScore ?? 0}</div>
-        </div>
-        <div class="live-game-minute">${status.primary}</div>
-      </div>`;
-  }).join("");
+  grid.innerHTML = live.map(f => `
+    <div class="live-game-card hover-glow" data-af-id="${f.id}">
+      <div class="live-game-league">${badgeImg(f.leagueLogo, f.league, "")}<span>${f.league}</span><span class="live-badge">LIVE</span></div>
+      <div class="live-game-row">
+        <div class="live-game-team">${badgeImg(f.home.logo, f.home.name, "")}<span>${f.home.name}</span></div>
+        <div class="live-game-score">${f.home.score ?? 0}</div>
+      </div>
+      <div class="live-game-row">
+        <div class="live-game-team">${badgeImg(f.away.logo, f.away.name, "")}<span>${f.away.name}</span></div>
+        <div class="live-game-score">${f.away.score ?? 0}</div>
+      </div>
+      <div class="live-game-minute">${afMinuteLabel(f)}</div>
+    </div>`).join("");
 }
 
 // --- Top Leagues strip — a curated set of leagues we actually have real
@@ -2914,6 +2933,7 @@ document.getElementById("prevDay").addEventListener("click", () => changeDate(-1
 document.getElementById("nextDay").addEventListener("click", () => changeDate(1));
 
 loadFixturesAndRender();
+renderLiveNowSection();
 initAuth();
 
 // --- Dark/light theme toggle, persisted to localStorage. The actual switch
