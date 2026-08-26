@@ -1439,7 +1439,59 @@ async function loadFixturesAndRender() {
   }
   loadMatches();
   renderFeaturedMatch();
+  renderLiveNowSection();
 }
+
+// --- Live Now (hero grid) — always the real live fixtures already loaded
+// for today, never mock data. An honest empty state when nothing's live
+// right now, rather than padding the grid with anything fake.
+function renderLiveNowSection() {
+  const grid = document.getElementById("liveNowGrid");
+  const live = currentFixtures.filter(f => isLiveStatus(f.status)).slice(0, 6);
+
+  if (live.length === 0) {
+    grid.innerHTML = `<div class="live-now-empty">No live matches right now. Check back during a matchday, or browse today's fixtures below.</div>`;
+    return;
+  }
+
+  grid.innerHTML = live.map(f => {
+    const status = matchStatusDisplay(f);
+    return `
+      <div class="live-game-card hover-glow" onclick="openMatchModal('${f.id}')">
+        <div class="live-game-league">${badgeImg(leagueLogos[f.league], f.league, "")}<span>${f.league}</span></div>
+        <div class="live-game-row">
+          <div class="live-game-team">${badgeImg(f.home.logo, f.home.name, "")}<span>${f.home.name}</span></div>
+          <div class="live-game-score">${f.homeScore ?? 0}</div>
+        </div>
+        <div class="live-game-row">
+          <div class="live-game-team">${badgeImg(f.away.logo, f.away.name, "")}<span>${f.away.name}</span></div>
+          <div class="live-game-score">${f.awayScore ?? 0}</div>
+        </div>
+        <div class="live-game-minute">${status.primary}</div>
+      </div>`;
+  }).join("");
+}
+
+// --- Top Leagues strip — a curated set of leagues we actually have real
+// badge art and fixture data for (not a wishlist of competitions like
+// Champions League that aren't in GoalHub's tracked league list).
+const TOP_LEAGUES = ["Premier League", "La Liga", "Serie A", "Bundesliga", "Ligue 1", "Brasileirao", "MLS"];
+
+function jumpToLeague(league) {
+  setViewMode("matches");
+  filterLeague(league, null);
+  document.querySelector(".main-layout").scrollIntoView({ behavior: "smooth" });
+}
+
+function renderTopLeaguesSection() {
+  const scroll = document.getElementById("topLeaguesScroll");
+  scroll.innerHTML = TOP_LEAGUES.map(league => `
+    <div class="top-league-card hover-glow" onclick="jumpToLeague('${league}')">
+      ${badgeImg(leagueLogos[league], league, "")}
+      <span>${league}</span>
+    </div>`).join("");
+}
+renderTopLeaguesSection();
 
 // Central entry point for any date change — arrows, the date picker, and
 // LIVE all funnel through here so the fetch/render/label logic lives in
@@ -2863,3 +2915,46 @@ document.getElementById("nextDay").addEventListener("click", () => changeDate(1)
 
 loadFixturesAndRender();
 initAuth();
+
+// --- Dark/light theme toggle, persisted to localStorage. The actual switch
+// on load happens inline in <head> (before first paint, avoids a flash);
+// this just handles the runtime toggle and keeping the button icon in sync.
+const THEME_KEY = "goalhub_theme";
+
+function applyThemeToggleIcon() {
+  const isLight = document.documentElement.getAttribute("data-theme") === "light";
+  document.getElementById("themeToggleBtn").textContent = isLight ? "☀️" : "🌙";
+}
+
+function toggleTheme() {
+  const isLight = document.documentElement.getAttribute("data-theme") === "light";
+  if (isLight) {
+    document.documentElement.removeAttribute("data-theme");
+    localStorage.setItem(THEME_KEY, "dark");
+  } else {
+    document.documentElement.setAttribute("data-theme", "light");
+    localStorage.setItem(THEME_KEY, "light");
+  }
+  applyThemeToggleIcon();
+}
+applyThemeToggleIcon();
+
+// --- Sticky header intensifies (more opaque + shadow) once the page has
+// actually scrolled, rather than looking identical to the resting state.
+window.addEventListener("scroll", () => {
+  document.getElementById("siteHeader").classList.toggle("scrolled", window.scrollY > 8);
+}, { passive: true });
+
+// --- Fade-in-on-scroll for the new homepage sections. Plain
+// IntersectionObserver + CSS transition — no animation library needed.
+const scrollFadeObserver = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add("in-view");
+      scrollFadeObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll(".hero-section, .live-now-section, .top-leagues-section, .main-layout")
+  .forEach(el => { el.classList.add("scroll-fade"); scrollFadeObserver.observe(el); });

@@ -8,24 +8,67 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <script>
+    // Applied before first paint (inline, in <head>) so switching themes
+    // doesn't flash the wrong one on load.
+    (function () {
+      try {
+        if (localStorage.getItem("goalhub_theme") === "light") {
+          document.documentElement.setAttribute("data-theme", "light");
+        }
+      } catch (err) { /* localStorage unavailable — default dark stays */ }
+    })();
+  </script>
 </head>
 <body>
 
-  <header class="site-header">
+  <header class="site-header" id="siteHeader">
     <div class="brand">
       <span class="brand-badge">⚽</span>
       <span class="brand-name">Goal<span class="accent">Hub</span></span>
     </div>
+
+    <nav class="header-nav">
+      <a href="#liveNowSection" class="header-nav-link" onclick="jumpToLive()">Live Scores</a>
+      <a href="#topLeaguesSection" class="header-nav-link">Leagues</a>
+    </nav>
 
     <div class="search-wrap">
       <span class="search-icon">🔍</span>
       <input type="text" id="searchInput" placeholder="Search teams… Arsenal, Real Madrid" oninput="searchTeams()">
     </div>
 
-    <div class="auth-area" id="authArea">
-      <button class="auth-btn" id="authBtn" onclick="openAuthModal()">Login</button>
+    <div class="header-actions">
+      <button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" aria-label="Toggle dark/light theme">🌙</button>
+      <div class="auth-area" id="authArea">
+        <button class="auth-btn" id="authBtn" onclick="openAuthModal()">Login</button>
+      </div>
     </div>
   </header>
+
+  <!-- HERO -->
+  <section class="hero-section">
+    <h1 class="hero-headline">Never Miss A <span class="accent">Goal</span></h1>
+    <p class="hero-sub">Real live scores, full squads, and standings for 40+ leagues worldwide — updated as it happens.</p>
+    <div class="hero-actions">
+      <button class="hero-btn hero-btn-primary" onclick="document.getElementById('liveNowSection').scrollIntoView({behavior:'smooth'})">View Live Games</button>
+      <button class="hero-btn hero-btn-secondary" onclick="openAuthModal()">Sign In</button>
+    </div>
+  </section>
+
+  <!-- LIVE NOW -->
+  <section class="live-now-section" id="liveNowSection">
+    <div class="section-heading">
+      <span class="live-now-title"><span class="live-dot"></span>Live Now</span>
+    </div>
+    <div class="live-now-grid" id="liveNowGrid"></div>
+  </section>
+
+  <!-- TOP LEAGUES -->
+  <section class="top-leagues-section" id="topLeaguesSection">
+    <div class="section-heading"><span>Top Leagues</span></div>
+    <div class="top-leagues-scroll" id="topLeaguesScroll"></div>
+  </section>
 
   <!-- LOGIN / ACCOUNT MODAL -->
   <div class="team-modal" id="authModal">
