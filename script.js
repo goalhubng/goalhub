@@ -1480,7 +1480,9 @@ async function renderLiveNowSection() {
 
   liveFixturesById = Object.fromEntries(live.map(f => [f.id, f]));
 
-  grid.innerHTML = live.map(f => `
+  grid.innerHTML = live.map(f => {
+    const watching = notifyMeFixtures.has(f.id);
+    return `
     <div class="live-game-card hover-glow" onclick="openLiveMatchModal('${f.id}')">
       <div class="live-game-league">${badgeImg(f.leagueLogo, f.league, "")}<span>${f.league}</span><span class="live-badge">LIVE</span></div>
       <div class="live-game-row">
@@ -1491,8 +1493,63 @@ async function renderLiveNowSection() {
         <div class="live-game-team">${badgeImg(f.away.logo, f.away.name, "")}<span>${f.away.name}</span></div>
         <div class="live-game-score">${f.away.score ?? 0}</div>
       </div>
-      <div class="live-game-minute">${afMinuteLabel(f)}</div>
-    </div>`).join("");
+      <div class="live-game-footer">
+        <span class="live-game-minute">${afMinuteLabel(f)}</span>
+        <span class="notify-bell${watching ? " watching" : ""}" onclick="event.stopPropagation(); toggleNotifyMe('${f.id}')" title="Notify me on goals (while this tab is open)">${watching ? "🔔" : "🔕"}</span>
+      </div>
+    </div>`;
+  }).join("");
+
+  scheduleGoalWatch();
+}
+
+// --- Goal notifications, real but scoped honestly: this uses the browser
+// Notification API with a client-side polling loop, so it only fires while
+// this GoalHub tab stays open — NOT true push (which would keep working
+// with the site closed, and needs a service worker + VAPID keys + a
+// server-side cron job watching scores, a much bigger separate build).
+const notifyMeFixtures = new Set();
+let goalWatchInterval = null;
+
+async function toggleNotifyMe(fixtureId) {
+  if (!notifyMeFixtures.has(fixtureId)) {
+    if (typeof Notification === "undefined") {
+      alert("This browser doesn't support notifications.");
+      return;
+    }
+    if (Notification.permission === "default") {
+      const perm = await Notification.requestPermission();
+      if (perm !== "granted") return;
+    }
+    if (Notification.permission !== "granted") return;
+    notifyMeFixtures.add(fixtureId);
+  } else {
+    notifyMeFixtures.delete(fixtureId);
+  }
+  renderLiveNowSection();
+}
+
+function scheduleGoalWatch() {
+  if (goalWatchInterval) return; // already running
+  goalWatchInterval = setInterval(async () => {
+    if (notifyMeFixtures.size === 0) return;
+    try {
+      const res = await fetch(`${CHAT_WORKER_BASE}/live-fixtures`);
+      if (!res.ok) return;
+      const data = await res.json();
+      (data.fixtures || []).forEach(f => {
+        if (!notifyMeFixtures.has(f.id)) return;
+        const prev = liveFixturesById[f.id];
+        if (!prev) return;
+        if (f.home.score !== prev.home.score || f.away.score !== prev.away.score) {
+          const scorer = f.home.score !== prev.home.score ? f.home.name : f.away.name;
+          new Notification("GOAL!", { body: `${scorer} — ${f.home.name} ${f.home.score}-${f.away.score} ${f.away.name} ${afMinuteLabel(f)}` });
+        }
+        if (!AF_IN_PROGRESS_STATUSES.has(f.statusShort)) notifyMeFixtures.delete(f.id); // match ended
+      });
+      liveFixturesById = Object.fromEntries((data.fixtures || []).map(f => [f.id, f]));
+    } catch (err) { /* transient — try again next tick */ }
+  }, 45000);
 }
 
 // --- Live Now match detail modal. Separate from the main match modal
@@ -1689,8 +1746,39 @@ function renderMatchRow(f) {
         ${clickableTeam(f.home)}
         ${clickableTeam(f.away)}
       </div>
-      <div class="fav-star${favorited ? " favorited" : ""}" onclick="event.stopPropagation(); toggleFavorite('${f.id}')">${favorited ? "★" : "☆"}</div>
+      <div class="match-row-actions">
+        <span class="share-btn" onclick="event.stopPropagation(); shareMatch(this, '${f.id}', '${f.home.name.replace(/'/g, "")}', '${f.away.name.replace(/'/g, "")}')" aria-label="Share match">🔗</span>
+        <div class="fav-star${favorited ? " favorited" : ""}" onclick="event.stopPropagation(); toggleFavorite('${f.id}')">${favorited ? "★" : "☆"}</div>
+      </div>
     </div>`;
+}
+
+// Native share sheet where available (mobile browsers, some desktop
+// browsers); falls back to copying a shareable line to the clipboard
+// everywhere else, with a brief visual confirmation either way.
+async function shareMatch(el, matchId, homeName, awayName) {
+  const url = `${window.location.origin}${window.location.pathname}?match=${matchId}`;
+  const text = `Watch ${homeName} vs ${awayName} on GoalHub`;
+
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: "GoalHub", text, url });
+    } catch (err) { /* user cancelled the share sheet — not an error */ }
+    return;
+  }
+
+  try {
+    await navigator.clipboard.writeText(`${text} — ${url}`);
+    flashShareFeedback(el, "✓");
+  } catch (err) {
+    flashShareFeedback(el, "✕");
+  }
+}
+
+function flashShareFeedback(el, symbol) {
+  const original = el.textContent;
+  el.textContent = symbol;
+  setTimeout(() => { el.textContent = original; }, 1500);
 }
 
 // null = auto (apply the favorites filter whenever the user has any
@@ -1965,9 +2053,31 @@ function setViewMode(mode) {
   document.getElementById("viewTeamsBtn").classList.toggle("active", mode === "teams");
   document.getElementById("viewFavoritesBtn").classList.toggle("active", mode === "favorites");
   document.getElementById("viewLeaderboardBtn").classList.toggle("active", mode === "leaderboard");
+  document.getElementById("viewMyPredictionsBtn").classList.toggle("active", mode === "mypredictions");
   if (mode === "teams" || mode === "favorites") renderAllTeams();
   else if (mode === "leaderboard") renderLeaderboard();
+  else if (mode === "mypredictions") renderMyPredictionsView();
   else loadMatches();
+}
+
+function renderMyPredictionsView() {
+  if (!currentUser) {
+    matchesDiv.innerHTML = `<div class="no-results">Log in to see your predictions.</div>`;
+    return;
+  }
+  if (!myPredictionsByFixture || myPredictionsByFixture.size === 0) {
+    matchesDiv.innerHTML = `<div class="no-results">No predictions yet. Open an upcoming match and use the Predict tab to make one.</div>`;
+    return;
+  }
+  const rows = [...myPredictionsByFixture.values()].sort((a, b) => (b.kickoff_at || 0) - (a.kickoff_at || 0));
+  matchesDiv.innerHTML = `
+    <div class="leaderboard-list">
+      ${rows.map(p => `
+        <div class="leaderboard-row">
+          <span class="predict-my-teams">${p.home_team} <strong>${p.predicted_home} - ${p.predicted_away}</strong> ${p.away_team}</span>
+          <span class="leaderboard-points">${p.resolved ? `${p.points} pt${p.points === 1 ? "" : "s"}` : "Pending"}</span>
+        </div>`).join("")}
+    </div>`;
 }
 
 async function renderLeaderboard() {

@@ -428,7 +428,10 @@ async function handleMyPredictions(request, env) {
   const user = await authenticate(request, env);
   if (!user) return jsonResponse({ error: "unauthorized" }, 401);
   const { results } = await env.goalhub_db
-    .prepare("SELECT fixture_id, predicted_home, predicted_away, points, resolved FROM predictions WHERE user_id = ?")
+    .prepare(
+      `SELECT fixture_id, home_team, away_team, kickoff_at, predicted_home, predicted_away, points, resolved
+       FROM predictions WHERE user_id = ? ORDER BY kickoff_at DESC`
+    )
     .bind(user.id)
     .all();
   return jsonResponse({ predictions: results });
