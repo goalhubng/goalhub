@@ -484,7 +484,195 @@ const allTeams = [
   {name: "SV 07 Elversberg", league: "2. Bundesliga", logo: ""},
   {name: "SV Darmstadt 98", league: "2. Bundesliga", logo: ""},
   {name: "SpVgg Greuther Fürth", league: "2. Bundesliga", logo: ""},
-  {name: "VfL Bochum", league: "2. Bundesliga", logo: ""}
+  {name: "VfL Bochum", league: "2. Bundesliga", logo: ""},
+  // Nigeria NPFL (20 teams)
+  {name: "Abia Warriors", league: "Nigeria NPFL", logo: ""},
+  {name: "Barau", league: "Nigeria NPFL", logo: ""},
+  {name: "Bayelsa United", league: "Nigeria NPFL", logo: ""},
+  {name: "Bendel Insurance", league: "Nigeria NPFL", logo: ""},
+  {name: "El-Kanemi Warriors", league: "Nigeria NPFL", logo: ""},
+  {name: "Enugu Rangers", league: "Nigeria NPFL", logo: ""},
+  {name: "Enyimba", league: "Nigeria NPFL", logo: ""},
+  {name: "Ikorodu City", league: "Nigeria NPFL", logo: ""},
+  {name: "Kano Pillars", league: "Nigeria NPFL", logo: ""},
+  {name: "Katsina United", league: "Nigeria NPFL", logo: ""},
+  {name: "Kun Khalifat", league: "Nigeria NPFL", logo: ""},
+  {name: "Kwara United", league: "Nigeria NPFL", logo: ""},
+  {name: "Nasarawa United", league: "Nigeria NPFL", logo: ""},
+  {name: "Niger Tornadoes", league: "Nigeria NPFL", logo: ""},
+  {name: "Plateau United", league: "Nigeria NPFL", logo: ""},
+  {name: "Remo Stars", league: "Nigeria NPFL", logo: ""},
+  {name: "Rivers United", league: "Nigeria NPFL", logo: ""},
+  {name: "Shooting Stars", league: "Nigeria NPFL", logo: ""},
+  {name: "Warri Wolves", league: "Nigeria NPFL", logo: ""},
+  {name: "Wikki Tourists", league: "Nigeria NPFL", logo: ""},
+  // Brazil Serie B (19 teams — Athletico Paranaense already listed under Brasileirao, excluded here)
+  {name: "Amazonas", league: "Brazil Serie B", logo: ""},
+  {name: "America Mineiro", league: "Brazil Serie B", logo: ""},
+  {name: "Athletic", league: "Brazil Serie B", logo: ""},
+  {name: "Avai", league: "Brazil Serie B", logo: ""},
+  {name: "Botafogo-SP", league: "Brazil Serie B", logo: ""},
+  {name: "Chapecoense", league: "Brazil Serie B", logo: ""},
+  {name: "Coritiba", league: "Brazil Serie B", logo: ""},
+  {name: "CRB", league: "Brazil Serie B", logo: ""},
+  {name: "Ferroviaria", league: "Brazil Serie B", logo: ""},
+  {name: "Goias", league: "Brazil Serie B", logo: ""},
+  {name: "Novorizontino", league: "Brazil Serie B", logo: ""},
+  {name: "Operario Ferroviario", league: "Brazil Serie B", logo: ""},
+  {name: "Paysandu", league: "Brazil Serie B", logo: ""},
+  {name: "Remo", league: "Brazil Serie B", logo: ""},
+  {name: "Vila Nova", league: "Brazil Serie B", logo: ""},
+  {name: "Volta Redonda", league: "Brazil Serie B", logo: ""},
+  // Argentina Primera Nacional (35 teams — Godoy Cruz already listed under Liga Profesional Argentina, excluded here)
+  {name: "Acassuso", league: "Argentina Primera Nacional", logo: ""},
+  {name: "Agropecuario Argentino", league: "Argentina Primera Nacional", logo: ""},
+  {name: "All Boys", league: "Argentina Primera Nacional", logo: ""},
+  {name: "Almagro", league: "Argentina Primera Nacional", logo: ""},
+  {name: "Almirante Brown", league: "Argentina Primera Nacional", logo: ""},
+  {name: "Atlanta", league: "Argentina Primera Nacional", logo: ""},
+  {name: "Atletico de Rafaela", league: "Argentina Primera Nacional", logo: ""},
+  {name: "Central Norte", league: "Argentina Primera Nacional", logo: ""},
+  {name: "Chacarita Juniors", league: "Argentina Primera Nacional", logo: ""},
+  {name: "Chaco For Ever", league: "Argentina Primera Nacional", logo: ""},
+  {name: "Ciudad de Bolivar", league: "Argentina Primera Nacional", logo: ""},
+  {name: "Colegiales", league: "Argentina Primera Nacional", logo: ""},
+  {name: "Colon", league: "Argentina Primera Nacional", logo: ""},
+  {name: "Defensores de Belgrano", league: "Argentina Primera Nacional", logo: ""},
+  {name: "Deportivo Madryn", league: "Argentina Primera Nacional", logo: ""},
+  {name: "Deportivo Maipu", league: "Argentina Primera Nacional", logo: ""},
+  {name: "Deportivo Moron", league: "Argentina Primera Nacional", logo: ""},
+  {name: "Estudiantes (BA)", league: "Argentina Primera Nacional", logo: ""},
+  {name: "Ferrocarril Midland", league: "Argentina Primera Nacional", logo: ""},
+  {name: "Ferro Carril Oeste", league: "Argentina Primera Nacional", logo: ""},
+  {name: "Gimnasia y Esgrima (J)", league: "Argentina Primera Nacional", logo: ""},
+  {name: "Gimnasia y Tiro", league: "Argentina Primera Nacional", logo: ""},
+  {name: "Guemes", league: "Argentina Primera Nacional", logo: ""},
+  {name: "Los Andes", league: "Argentina Primera Nacional", logo: ""},
+  {name: "Mitre (SdE)", league: "Argentina Primera Nacional", logo: ""},
+  {name: "Nueva Chicago", league: "Argentina Primera Nacional", logo: ""},
+  {name: "Patronato", league: "Argentina Primera Nacional", logo: ""},
+  {name: "Quilmes", league: "Argentina Primera Nacional", logo: ""},
+  {name: "Racing (C)", league: "Argentina Primera Nacional", logo: ""},
+  {name: "San Martin (SJ)", league: "Argentina Primera Nacional", logo: ""},
+  {name: "San Martin (T)", league: "Argentina Primera Nacional", logo: ""},
+  {name: "San Miguel", league: "Argentina Primera Nacional", logo: ""},
+  {name: "San Telmo", league: "Argentina Primera Nacional", logo: ""},
+  {name: "Temperley", league: "Argentina Primera Nacional", logo: ""},
+  {name: "Tristan Suarez", league: "Argentina Primera Nacional", logo: ""},
+  // Turkey 1.Lig (16 teams — Adana Demirspor, Hatayspor, Pendikspor, Sivasspor already listed under Super Lig, excluded here)
+  {name: "Amedspor", league: "Turkey 1.Lig", logo: ""},
+  {name: "Bandirmaspor", league: "Turkey 1.Lig", logo: ""},
+  {name: "Bodrum", league: "Turkey 1.Lig", logo: ""},
+  {name: "Boluspor", league: "Turkey 1.Lig", logo: ""},
+  {name: "Corum", league: "Turkey 1.Lig", logo: ""},
+  {name: "Esenler Erokspor", league: "Turkey 1.Lig", logo: ""},
+  {name: "Erzurumspor", league: "Turkey 1.Lig", logo: ""},
+  {name: "Istanbulspor", league: "Turkey 1.Lig", logo: ""},
+  {name: "Igdir", league: "Turkey 1.Lig", logo: ""},
+  {name: "Kecirengucu", league: "Turkey 1.Lig", logo: ""},
+  {name: "Manisa", league: "Turkey 1.Lig", logo: ""},
+  {name: "Sakaryaspor", league: "Turkey 1.Lig", logo: ""},
+  {name: "Sariyer", league: "Turkey 1.Lig", logo: ""},
+  {name: "Serikspor", league: "Turkey 1.Lig", logo: ""},
+  {name: "Umraniyespor", league: "Turkey 1.Lig", logo: ""},
+  {name: "Vanspor", league: "Turkey 1.Lig", logo: ""},
+  // Poland Ekstraklasa (18 teams)
+  {name: "Arka Gdynia", league: "Poland Ekstraklasa", logo: ""},
+  {name: "Bruk-Bet Termalica Nieciecza", league: "Poland Ekstraklasa", logo: ""},
+  {name: "Cracovia", league: "Poland Ekstraklasa", logo: ""},
+  {name: "GKS Katowice", league: "Poland Ekstraklasa", logo: ""},
+  {name: "Gornik Zabrze", league: "Poland Ekstraklasa", logo: ""},
+  {name: "Jagiellonia Bialystok", league: "Poland Ekstraklasa", logo: ""},
+  {name: "Korona Kielce", league: "Poland Ekstraklasa", logo: ""},
+  {name: "Lech Poznan", league: "Poland Ekstraklasa", logo: ""},
+  {name: "Lechia Gdansk", league: "Poland Ekstraklasa", logo: ""},
+  {name: "Legia Warsaw", league: "Poland Ekstraklasa", logo: ""},
+  {name: "Motor Lublin", league: "Poland Ekstraklasa", logo: ""},
+  {name: "Piast Gliwice", league: "Poland Ekstraklasa", logo: ""},
+  {name: "Pogon Szczecin", league: "Poland Ekstraklasa", logo: ""},
+  {name: "Radomiak Radom", league: "Poland Ekstraklasa", logo: ""},
+  {name: "Rakow Czestochowa", league: "Poland Ekstraklasa", logo: ""},
+  {name: "Widzew Lodz", league: "Poland Ekstraklasa", logo: ""},
+  {name: "Wisla Plock", league: "Poland Ekstraklasa", logo: ""},
+  {name: "Zaglebie Lubin", league: "Poland Ekstraklasa", logo: ""},
+  // Belgium Challenger Pro (14 teams — Beerschot already listed under Jupiler Pro, excluded here)
+  {name: "Virton", league: "Belgium Challenger Pro", logo: ""},
+  {name: "Lokeren", league: "Belgium Challenger Pro", logo: ""},
+  {name: "Eupen", league: "Belgium Challenger Pro", logo: ""},
+  {name: "Club NXT", league: "Belgium Challenger Pro", logo: ""},
+  {name: "Dender EH", league: "Belgium Challenger Pro", logo: ""},
+  {name: "Francs Borains", league: "Belgium Challenger Pro", logo: ""},
+  {name: "Hasselt", league: "Belgium Challenger Pro", logo: ""},
+  {name: "Patro Eisden Maasmechelen", league: "Belgium Challenger Pro", logo: ""},
+  {name: "Lierse", league: "Belgium Challenger Pro", logo: ""},
+  {name: "RFC Liege", league: "Belgium Challenger Pro", logo: ""},
+  {name: "RSCA Futures", league: "Belgium Challenger Pro", logo: ""},
+  {name: "Seraing", league: "Belgium Challenger Pro", logo: ""},
+  {name: "Jong Genk", league: "Belgium Challenger Pro", logo: ""},
+  {name: "Jong KAA Gent", league: "Belgium Challenger Pro", logo: ""},
+  // Denmark Superliga (12 teams)
+  {name: "AGF", league: "Denmark Superliga", logo: ""},
+  {name: "Brondby", league: "Denmark Superliga", logo: ""},
+  {name: "Copenhagen", league: "Denmark Superliga", logo: ""},
+  {name: "Fredericia", league: "Denmark Superliga", logo: ""},
+  {name: "Midtjylland", league: "Denmark Superliga", logo: ""},
+  {name: "Nordsjaelland", league: "Denmark Superliga", logo: ""},
+  {name: "OB", league: "Denmark Superliga", logo: ""},
+  {name: "Randers", league: "Denmark Superliga", logo: ""},
+  {name: "Silkeborg", league: "Denmark Superliga", logo: ""},
+  {name: "Sonderjyske", league: "Denmark Superliga", logo: ""},
+  {name: "Vejle", league: "Denmark Superliga", logo: ""},
+  {name: "Viborg", league: "Denmark Superliga", logo: ""},
+  // Sweden Allsvenskan (16 teams)
+  {name: "AIK", league: "Sweden Allsvenskan", logo: ""},
+  {name: "BK Hacken", league: "Sweden Allsvenskan", logo: ""},
+  {name: "Degerfors IF", league: "Sweden Allsvenskan", logo: ""},
+  {name: "Djurgardens IF", league: "Sweden Allsvenskan", logo: ""},
+  {name: "GAIS", league: "Sweden Allsvenskan", logo: ""},
+  {name: "Halmstads BK", league: "Sweden Allsvenskan", logo: ""},
+  {name: "Hammarby IF", league: "Sweden Allsvenskan", logo: ""},
+  {name: "IF Brommapojkarna", league: "Sweden Allsvenskan", logo: ""},
+  {name: "IF Elfsborg", league: "Sweden Allsvenskan", logo: ""},
+  {name: "IFK Goteborg", league: "Sweden Allsvenskan", logo: ""},
+  {name: "IK Sirius", league: "Sweden Allsvenskan", logo: ""},
+  {name: "Kalmar FF", league: "Sweden Allsvenskan", logo: ""},
+  {name: "Malmo FF", league: "Sweden Allsvenskan", logo: ""},
+  {name: "Mjallby AIF", league: "Sweden Allsvenskan", logo: ""},
+  {name: "Orgryte IS", league: "Sweden Allsvenskan", logo: ""},
+  {name: "Vasteras SK", league: "Sweden Allsvenskan", logo: ""},
+  // Norway Eliteserien (16 teams)
+  {name: "Aalesund", league: "Norway Eliteserien", logo: ""},
+  {name: "Bodo/Glimt", league: "Norway Eliteserien", logo: ""},
+  {name: "Brann", league: "Norway Eliteserien", logo: ""},
+  {name: "Fredrikstad", league: "Norway Eliteserien", logo: ""},
+  {name: "HamKam", league: "Norway Eliteserien", logo: ""},
+  {name: "KFUM", league: "Norway Eliteserien", logo: ""},
+  {name: "Kristiansund", league: "Norway Eliteserien", logo: ""},
+  {name: "Lillestrom", league: "Norway Eliteserien", logo: ""},
+  {name: "Molde", league: "Norway Eliteserien", logo: ""},
+  {name: "Rosenborg", league: "Norway Eliteserien", logo: ""},
+  {name: "Sandefjord", league: "Norway Eliteserien", logo: ""},
+  {name: "Sarpsborg", league: "Norway Eliteserien", logo: ""},
+  {name: "Start", league: "Norway Eliteserien", logo: ""},
+  {name: "Tromso", league: "Norway Eliteserien", logo: ""},
+  {name: "Viking", league: "Norway Eliteserien", logo: ""},
+  {name: "Valerenga", league: "Norway Eliteserien", logo: ""},
+  // Mexico Liga de Expansion (15 teams)
+  {name: "Atlante", league: "Mexico Liga de Expansion", logo: ""},
+  {name: "Atletico La Paz", league: "Mexico Liga de Expansion", logo: ""},
+  {name: "Atletico Morelia", league: "Mexico Liga de Expansion", logo: ""},
+  {name: "Cancun", league: "Mexico Liga de Expansion", logo: ""},
+  {name: "Irapuato", league: "Mexico Liga de Expansion", logo: ""},
+  {name: "Jaiba Brava", league: "Mexico Liga de Expansion", logo: ""},
+  {name: "Oaxaca", league: "Mexico Liga de Expansion", logo: ""},
+  {name: "Sinaloa", league: "Mexico Liga de Expansion", logo: ""},
+  {name: "Tapatio", league: "Mexico Liga de Expansion", logo: ""},
+  {name: "Tepatitlan", league: "Mexico Liga de Expansion", logo: ""},
+  {name: "Tlaxcala", league: "Mexico Liga de Expansion", logo: ""},
+  {name: "UAT", league: "Mexico Liga de Expansion", logo: ""},
+  {name: "U. de G.", league: "Mexico Liga de Expansion", logo: ""},
+  {name: "Venados", league: "Mexico Liga de Expansion", logo: ""},
+  {name: "Zacatecas", league: "Mexico Liga de Expansion", logo: ""}
 ];
 
 // Real, verified league badges pulled directly from TheSportsDB's own
@@ -626,7 +814,17 @@ const LEAGUE_IDS = {
   "La Liga 2": 4400,
   "Ligue 2": 4401,
   "Serie B": 4394,
-  "2. Bundesliga": 4399
+  "2. Bundesliga": 4399,
+  "Nigeria NPFL": 4827,
+  "Brazil Serie B": 4404,
+  "Argentina Primera Nacional": 4616,
+  "Turkey 1.Lig": 4676,
+  "Poland Ekstraklasa": 4422,
+  "Belgium Challenger Pro": 4623,
+  "Denmark Superliga": 4340,
+  "Sweden Allsvenskan": 4347,
+  "Norway Eliteserien": 4358,
+  "Mexico Liga de Expansion": 4654
 };
 
 function badgeImg(logo, name, cssClass) {
@@ -702,7 +900,17 @@ const LEAGUE_COUNTRY = {
   "La Liga 2": "Spain",
   "Ligue 2": "France",
   "Serie B": "Italy",
-  "2. Bundesliga": "Germany"
+  "2. Bundesliga": "Germany",
+  "Nigeria NPFL": "Nigeria",
+  "Brazil Serie B": "Brazil",
+  "Argentina Primera Nacional": "Argentina",
+  "Turkey 1.Lig": "Turkey",
+  "Poland Ekstraklasa": "Poland",
+  "Belgium Challenger Pro": "Belgium",
+  "Denmark Superliga": "Denmark",
+  "Sweden Allsvenskan": "Sweden",
+  "Norway Eliteserien": "Norway",
+  "Mexico Liga de Expansion": "Mexico"
 };
 
 // --- Fixtures for the currently-selected DAY, fetched live from the API,
@@ -758,31 +966,21 @@ function formatDateLabel(date) {
   return d.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "short" });
 }
 
-// Browsing one exact calendar day at a time meant an off-day showed nothing
-// at all, even though that's a real gap between fixtures rather than a
-// broken app. Instead, each ‹ › click loads a 3-day window (yesterday /
-// today / tomorrow relative to wherever you've navigated to) — a mix of
-// recent results and near-term fixtures — without ballooning into a whole
-// week's worth of requests against the shared free API key.
-const WINDOW_DAYS_BACK = 1;
-const WINDOW_DAYS_FORWARD = 1;
-const WINDOW_SIZE = WINDOW_DAYS_BACK + WINDOW_DAYS_FORWARD + 1;
-
+// Flashscore-style: one exact calendar day at a time, browsed with the
+// ‹ › arrows or jumped to directly via the LIVE button or date picker. An
+// off-day genuinely showing no fixtures is expected, real behavior — not
+// something to paper over with a wider window.
 function windowDates(centerDate) {
-  const dates = [];
-  for (let offset = -WINDOW_DAYS_BACK; offset <= WINDOW_DAYS_FORWARD; offset++) {
-    const d = new Date(centerDate);
-    d.setDate(d.getDate() + offset);
-    dates.push(d);
-  }
-  return dates;
+  return [new Date(centerDate)];
 }
 
-function windowLabel(centerDate) {
-  const dates = windowDates(centerDate);
-  const first = formatApiDate(dateKey(dates[0]));
-  const last = formatApiDate(dateKey(dates[dates.length - 1]));
-  return `${first} – ${last}`;
+// "Today" / "Yesterday" / "Tomorrow" / "26 Aug" — matches the date-bar label.
+function dateBarLabel(centerDate) {
+  const diffDays = Math.round((new Date(centerDate).setHours(0, 0, 0, 0) - new Date().setHours(0, 0, 0, 0)) / 86400000);
+  if (diffDays === 0) return "Today";
+  if (diffDays === 1) return "Tomorrow";
+  if (diffDays === -1) return "Yesterday";
+  return formatApiDate(dateKey(centerDate));
 }
 
 async function fetchFixturesForWindow(centerDate) {
@@ -823,7 +1021,9 @@ async function loadFixturesAndRender() {
   fixturesLoading = true;
   matchesDiv.innerHTML = `<div class="no-results">Loading real fixtures…</div>`;
   document.getElementById("featured").innerHTML = `<div class="team-no-fixture">Loading…</div>`;
-  document.querySelector(".date-label").textContent = windowLabel(currentDate);
+  document.querySelector(".date-label").textContent = dateBarLabel(currentDate);
+  document.getElementById("calendarDayNum").textContent = currentDate.getDate();
+  document.getElementById("datePickerInput").value = dateKey(currentDate);
 
   const result = await fetchFixturesForWindow(currentDate);
   currentFixtures = result.fixtures;
@@ -839,9 +1039,23 @@ async function loadFixturesAndRender() {
   renderFeaturedMatch();
 }
 
-function changeDate(delta) {
-  currentDate.setDate(currentDate.getDate() + delta * WINDOW_SIZE);
+// Central entry point for any date change — arrows, the date picker, and
+// LIVE all funnel through here so the fetch/render/label logic lives in
+// exactly one place.
+function loadMatchesForDate(date) {
+  currentDate = new Date(date);
   loadFixturesAndRender();
+}
+
+function changeDate(delta) {
+  const d = new Date(currentDate);
+  d.setDate(d.getDate() + delta);
+  loadMatchesForDate(d);
+}
+
+function jumpToLive() {
+  statusFilter = "live";
+  loadMatchesForDate(new Date());
 }
 
 let statusFilter = "all";
@@ -866,6 +1080,7 @@ function renderMatchRow(f) {
 }
 
 function loadMatches() {
+  document.getElementById("liveBtn").classList.toggle("active", statusFilter === "live");
   let fixturesToUse = activeLeague === "All" ? currentFixtures : currentFixtures.filter(f => f.league === activeLeague);
 
   if (searchTerm !== "") {
@@ -939,14 +1154,73 @@ function loadMatches() {
 
 function searchTeams() {
   searchTerm = document.getElementById("searchInput").value;
-  loadMatches();
+  if (viewMode === "teams") renderAllTeams();
+  else loadMatches();
 }
 
 function filterLeague(league, el) {
   activeLeague = league;
   document.querySelectorAll(".comp-item").forEach(i => i.classList.remove("active"));
-  el.classList.add("active");
-  loadMatches();
+  if (el) el.classList.add("active");
+  if (viewMode === "teams") renderAllTeams();
+  else loadMatches();
+}
+
+// --- All Matches / All Teams toggle. "All Teams" browses the full roster
+// (every team we know about, regardless of whether it has a fixture in the
+// currently-loaded date) rather than derailing into the day's fixture data.
+let viewMode = "matches";
+
+function setViewMode(mode) {
+  viewMode = mode;
+  document.getElementById("viewMatchesBtn").classList.toggle("active", mode === "matches");
+  document.getElementById("viewTeamsBtn").classList.toggle("active", mode === "teams");
+  if (mode === "teams") renderAllTeams();
+  else loadMatches();
+}
+
+function renderAllTeams() {
+  const term = searchTerm.trim().toLowerCase();
+  let teams = activeLeague === "All" ? allTeams : allTeams.filter(t => t.league === activeLeague);
+  if (term) teams = teams.filter(t => t.name.toLowerCase().includes(term));
+
+  if (teams.length === 0) {
+    matchesDiv.innerHTML = `<div class="no-results">No teams match${term ? ` "${searchTerm}"` : ""}. Try another search or league.</div>`;
+    return;
+  }
+
+  const leagueOptions = ["All", ...leagues]
+    .map(l => `<option value="${l}"${l === activeLeague ? " selected" : ""}>${l === "All" ? "All Leagues" : l}</option>`)
+    .join("");
+
+  const byLeague = {};
+  teams.forEach(t => { (byLeague[t.league] = byLeague[t.league] || []).push(t); });
+
+  let html = `
+    <div class="team-view-controls">
+      <select class="league-filter-select" onchange="filterLeague(this.value, null)">${leagueOptions}</select>
+    </div>`;
+
+  Object.keys(byLeague).forEach(league => {
+    html += `
+      <div class="league-group">
+        <div class="league-title">
+          ${badgeImg(leagueLogos[league], league, "")}
+          <div class="league-title-text">
+            <span class="league-name">${league}</span>
+            <span class="league-country">${LEAGUE_COUNTRY[league] || ""}</span>
+          </div>
+        </div>
+        <div class="team-grid">
+          ${byLeague[league].map(t => `
+            <div class="team-list-row" onclick="openTeamModal('', '${t.name.replace(/'/g, "")}', '${t.logo}', '${league.replace(/'/g, "")}')">
+              ${badgeImg(t.logo, t.name, "")}<span>${t.name}</span>
+            </div>`).join("")}
+        </div>
+      </div>`;
+  });
+
+  matchesDiv.innerHTML = html;
 }
 
 const compDiv = document.getElementById("competitions");
@@ -977,7 +1251,7 @@ function toggleMoreLeagues() {
 async function renderFeaturedMatch() {
   const featuredDiv = document.getElementById("featured");
   if (currentFixtures.length === 0) {
-    featuredDiv.innerHTML = `<div class="team-no-fixture">No fixtures for ${windowLabel(currentDate)}.</div>`;
+    featuredDiv.innerHTML = `<div class="team-no-fixture">No fixtures for ${dateBarLabel(currentDate)}.</div>`;
     return;
   }
   const marqueeFixtures = currentFixtures.filter(f => marqueeClubs.includes(f.home.name) || marqueeClubs.includes(f.away.name));
@@ -994,7 +1268,7 @@ async function renderFeaturedMatch() {
 
   featuredDiv.innerHTML = `
     <div class="featured-card">
-      <div class="featured-tag"><span class="dot"></span>${status.tag || windowLabel(currentDate)}</div>
+      <div class="featured-tag"><span class="dot"></span>${status.tag || dateBarLabel(currentDate)}</div>
       <div class="featured-teams">
         <div class="featured-team" onclick="openTeamModal('${home.id}','${home.name.replace(/'/g, "")}','${home.logo}','${league.replace(/'/g, "")}')">
           ${badgeImg(home.logo, home.name, "")}
@@ -1027,10 +1301,33 @@ function formatApiDate(dateStr) {
 const teamDetailCache = {};
 const teamSquadCache = {};
 const teamTabCache = {};
+const teamIdByName = {};
 let currentTeamModal = null;
 
+// A team clicked from the "All Teams" roster (rather than from a fixture)
+// has no known TheSportsDB ID yet — allTeams only carries name/league/logo.
+// Resolve it once by name and cache the result (including a confirmed miss)
+// so re-opening the same team is instant.
+async function resolveTeamId(teamName) {
+  if (teamIdByName[teamName] !== undefined) return teamIdByName[teamName];
+  try {
+    const data = await fetchJsonWithRetry(`${SPORTSDB_BASE}/searchteams.php?t=${encodeURIComponent(teamName)}`);
+    const candidates = (data.teams || []).filter(t => t.strSport === "Soccer");
+    const exact = candidates.find(t => t.strTeam.toLowerCase() === teamName.toLowerCase());
+    const id = (exact || candidates[0] || {}).idTeam || null;
+    teamIdByName[teamName] = id; // a real answer, including a genuine "not found" — safe to cache
+    return id;
+  } catch (err) {
+    // A transient failure (rate limit, network hiccup) isn't a real answer —
+    // don't cache it as "not found" or this team would show "coming soon"
+    // for the rest of the session even once the API recovers.
+    return null;
+  }
+}
+
 async function openTeamModal(teamId, teamName, teamLogo, teamLeague) {
-  currentTeamModal = { id: teamId, name: teamName, logo: teamLogo, league: teamLeague };
+  const token = Symbol();
+  currentTeamModal = { id: teamId || null, name: teamName, logo: teamLogo, league: teamLeague, token };
   document.getElementById("teamModalContent").innerHTML = `
     <div class="team-modal-header">
       ${badgeImg(teamLogo, teamName, "team-modal-badge")}
@@ -1042,12 +1339,21 @@ async function openTeamModal(teamId, teamName, teamLogo, teamLeague) {
     <div class="match-modal-tabs">
       <button class="match-tab-btn active" data-team-tab="overview" onclick="showTeamTab('overview')">Overview</button>
       <button class="match-tab-btn" data-team-tab="squad" onclick="showTeamTab('squad')">Squad</button>
+      <button class="match-tab-btn" data-team-tab="form" onclick="showTeamTab('form')">Last 5</button>
+      <button class="match-tab-btn" data-team-tab="stats" onclick="showTeamTab('stats')">Stats</button>
     </div>
     <div class="match-modal-tab-body" id="teamTabBody"></div>`;
   document.getElementById("teamModal").classList.add("open");
 
   if (!teamId) {
-    document.getElementById("teamTabBody").innerHTML = `<div class="team-no-fixture">No team ID available — can't fetch live data for this club.</div>`;
+    document.getElementById("teamTabBody").innerHTML = `<div class="team-no-fixture">Loading…</div>`;
+    teamId = await resolveTeamId(teamName);
+    if (!currentTeamModal || currentTeamModal.token !== token) return; // modal moved on to a different team
+    currentTeamModal.id = teamId;
+  }
+
+  if (!teamId) {
+    document.getElementById("teamTabBody").innerHTML = `<div class="team-no-fixture">Full data isn't available for ${teamName} yet — showing what we have.</div>`;
     return;
   }
 
@@ -1073,6 +1379,8 @@ async function showTeamTab(tab) {
   try {
     if (tab === "overview") html = await renderTeamOverviewTab(team.id, team.name);
     else if (tab === "squad") html = await renderTeamSquadTab(team.id, team.name);
+    else if (tab === "form") html = await renderTeamFormTab(team.id, team.name);
+    else if (tab === "stats") html = await renderTeamStatsTab(team);
   } catch (err) {
     failed = true;
     html = `<div class="no-results">Couldn't load this right now (the free API can be flaky under load). <span class="retry-link" onclick="showTeamTab('${tab}')">Tap to retry</span>.</div>`;
@@ -1109,35 +1417,94 @@ async function renderTeamOverviewTab(teamId, teamName) {
       </div>`;
   }
 
-  let resultsHtml = `<div class="team-no-fixture">No recent results available.</div>`;
-  if (detail.last && detail.last.length > 0) {
-    resultsHtml = detail.last.map(r => {
-      const isHome = r.strHomeTeam === teamName;
-      const teamGoals = Number(isHome ? r.intHomeScore : r.intAwayScore);
-      const oppGoals = Number(isHome ? r.intAwayScore : r.intHomeScore);
-      const homeLogo = resolveLogo(r.strHomeTeamBadge, r.strHomeTeam);
-      const awayLogo = resolveLogo(r.strAwayTeamBadge, r.strAwayTeam);
-      let outcome = "draw";
-      if (teamGoals > oppGoals) outcome = "win";
-      else if (teamGoals < oppGoals) outcome = "loss";
-      return `
-        <div class="team-result-row outcome-${outcome}">
-          <div class="team-result-date">${formatApiDate(r.dateEvent)}</div>
-          <div class="team-result-teams">
-            <span class="team-result-team">${badgeImg(homeLogo, r.strHomeTeam, "")}${r.strHomeTeam}</span>
-            <span class="team-result-vs">vs</span>
-            <span class="team-result-team">${badgeImg(awayLogo, r.strAwayTeam, "")}${r.strAwayTeam}</span>
-          </div>
-          <div class="team-result-score">${r.intHomeScore} - ${r.intAwayScore}</div>
-        </div>`;
-    }).join("");
-  }
+  const resultsHtml = renderTeamResultRows(detail.last, teamName);
 
   return `
     <div class="team-modal-section-title">Upcoming Fixture</div>
     ${fixtureHtml}
     <div class="team-modal-section-title">Recent Results</div>
     <div class="team-results-list">${resultsHtml}</div>`;
+}
+
+function renderTeamResultRows(results, teamName) {
+  if (!results || results.length === 0) return `<div class="team-no-fixture">No recent matches available.</div>`;
+  return results.map(r => {
+    const isHome = r.strHomeTeam === teamName;
+    const teamGoals = Number(isHome ? r.intHomeScore : r.intAwayScore);
+    const oppGoals = Number(isHome ? r.intAwayScore : r.intHomeScore);
+    const homeLogo = resolveLogo(r.strHomeTeamBadge, r.strHomeTeam);
+    const awayLogo = resolveLogo(r.strAwayTeamBadge, r.strAwayTeam);
+    let outcome = "draw";
+    if (teamGoals > oppGoals) outcome = "win";
+    else if (teamGoals < oppGoals) outcome = "loss";
+    return `
+      <div class="team-result-row outcome-${outcome}">
+        <div class="team-result-date">${formatApiDate(r.dateEvent)}</div>
+        <div class="team-result-teams">
+          <span class="team-result-team">${badgeImg(homeLogo, r.strHomeTeam, "")}${r.strHomeTeam}</span>
+          <span class="team-result-vs">vs</span>
+          <span class="team-result-team">${badgeImg(awayLogo, r.strAwayTeam, "")}${r.strAwayTeam}</span>
+        </div>
+        <div class="team-result-score">${r.intHomeScore} - ${r.intAwayScore}</div>
+      </div>`;
+  }).join("");
+}
+
+async function renderTeamFormTab(teamId, teamName) {
+  let detail = teamDetailCache[teamId];
+  if (!detail) {
+    const [lastRes, nextRes] = await Promise.all([
+      fetchJsonWithRetry(`${SPORTSDB_BASE}/eventslast.php?id=${teamId}`),
+      fetchJsonWithRetry(`${SPORTSDB_BASE}/eventsnext.php?id=${teamId}`)
+    ]);
+    detail = { last: (lastRes.results || []).slice(0, 5), next: (nextRes.events || []).slice(0, 1) };
+    teamDetailCache[teamId] = detail;
+  }
+  return `<div class="team-results-list">${renderTeamResultRows(detail.last, teamName)}</div>`;
+}
+
+// Season stats (Played/Won/Drawn/Lost/GF/GA/Points) — pulled from whichever
+// standings source has this team's row: full football-data.org standings
+// first (has real GF/GA), then a manual override, then TheSportsDB's
+// partial table (also has real GF/GA, just capped to a handful of teams).
+async function renderTeamStatsTab(team) {
+  const { league, name } = team;
+
+  if (STANDINGS_LEAGUES[league]) {
+    try {
+      const competition = STANDINGS_LEAGUES[league];
+      const season = seasonStringForLeague(league, dateKey(new Date())).split("-")[0];
+      const data = await fetchJsonWithRetry(`${CHAT_WORKER_BASE}/standings?competition=${competition}&season=${season}`);
+      const row = (data.table || []).find(r => normalizeTeamName(r.team.name) === normalizeTeamName(name) || normalizeTeamName(r.team.shortName) === normalizeTeamName(name));
+      if (row) return renderTeamStatsGrid({ played: row.playedGames, won: row.won, drawn: row.draw, lost: row.lost, gf: row.goalsFor, ga: row.goalsAgainst, pts: row.points });
+    } catch (err) { /* fall through to the next source */ }
+  }
+
+  const manualRow = (MANUAL_STANDINGS[league] || []).find(r => r.team === name);
+  if (manualRow) {
+    return renderTeamStatsGrid({ played: manualRow.p, won: manualRow.w, drawn: manualRow.d, lost: manualRow.l, gf: null, ga: null, pts: manualRow.pts });
+  }
+
+  const leagueId = LEAGUE_IDS[league];
+  if (leagueId) {
+    try {
+      const season = seasonStringForLeague(league, dateKey(new Date()));
+      const data = await fetchJsonWithRetry(`${SPORTSDB_BASE}/lookuptable.php?l=${leagueId}&s=${season}`);
+      const row = (data.table || []).find(r => r.strTeam === name);
+      if (row) return renderTeamStatsGrid({ played: row.intPlayed, won: row.intWin, drawn: row.intDraw, lost: row.intLoss, gf: row.intGoalsFor, ga: row.intGoalsAgainst, pts: row.intPoints });
+    } catch (err) { /* fall through */ }
+  }
+
+  return `<div class="team-no-fixture">Season stats aren't available for ${name} yet.</div>`;
+}
+
+function renderTeamStatsGrid(s) {
+  const cells = [
+    ["Played", s.played], ["Won", s.won], ["Drawn", s.drawn], ["Lost", s.lost],
+    ["Goals For", s.gf ?? "—"], ["Goals Against", s.ga ?? "—"], ["Points", s.pts]
+  ];
+  return `<div class="team-stats-grid">${cells.map(([label, val]) => `
+    <div class="team-stat-cell"><span class="team-stat-value">${val ?? "—"}</span><span class="team-stat-label">${label}</span></div>`).join("")}</div>`;
 }
 
 // Buckets TheSportsDB's free-text position strings ("Right-Back", "Defensive
@@ -1151,35 +1518,73 @@ function squadPositionGroup(position) {
   return "Coaching Staff";
 }
 
+function calcAge(dateBorn) {
+  const d = new Date(dateBorn);
+  if (!dateBorn || isNaN(d)) return null;
+  return Math.floor((Date.now() - d.getTime()) / (365.25 * 24 * 3600 * 1000));
+}
+
+// Covers the nationalities that actually turn up in these squads; anything
+// missing just shows the plain country name instead of a wrong or blank flag.
+const NATIONALITY_FLAGS = {
+  "England": "🏴󠁧󠁢󠁥󠁮󠁧󠁿", "Scotland": "🏴󠁧󠁢󠁳󠁣󠁴󠁿", "Wales": "🏴󠁧󠁢󠁷󠁬󠁳󠁿", "Northern Ireland": "🇬🇧", "Republic of Ireland": "🇮🇪", "Ireland": "🇮🇪",
+  "Spain": "🇪🇸", "France": "🇫🇷", "Germany": "🇩🇪", "Italy": "🇮🇹", "Portugal": "🇵🇹", "Netherlands": "🇳🇱", "Belgium": "🇧🇪",
+  "Austria": "🇦🇹", "Switzerland": "🇨🇭", "Poland": "🇵🇱", "Turkey": "🇹🇷", "Greece": "🇬🇷", "Denmark": "🇩🇰", "Sweden": "🇸🇪",
+  "Norway": "🇳🇴", "Finland": "🇫🇮", "Iceland": "🇮🇸", "Russia": "🇷🇺", "Ukraine": "🇺🇦", "Croatia": "🇭🇷", "Serbia": "🇷🇸",
+  "Slovenia": "🇸🇮", "Slovakia": "🇸🇰", "Czech Republic": "🇨🇿", "Hungary": "🇭🇺", "Romania": "🇷🇴", "Bulgaria": "🇧🇬",
+  "Bosnia and Herzegovina": "🇧🇦", "Montenegro": "🇲🇪", "North Macedonia": "🇲🇰", "Albania": "🇦🇱", "Kosovo": "🇽🇰",
+  "The Netherlands": "🇳🇱", "USA": "🇺🇸", "United States": "🇺🇸", "Canada": "🇨🇦", "Mexico": "🇲🇽", "Brazil": "🇧🇷",
+  "Argentina": "🇦🇷", "Uruguay": "🇺🇾", "Chile": "🇨🇱", "Colombia": "🇨🇴", "Peru": "🇵🇪", "Ecuador": "🇪🇨", "Paraguay": "🇵🇾",
+  "Bolivia": "🇧🇴", "Venezuela": "🇻🇪", "Japan": "🇯🇵", "South Korea": "🇰🇷", "Korea Republic": "🇰🇷", "China": "🇨🇳",
+  "Australia": "🇦🇺", "New Zealand": "🇳🇿", "Morocco": "🇲🇦", "Algeria": "🇩🇿", "Tunisia": "🇹🇳", "Egypt": "🇪🇬",
+  "Nigeria": "🇳🇬", "Ghana": "🇬🇭", "Senegal": "🇸🇳", "Ivory Coast": "🇨🇮", "Cote d'Ivoire": "🇨🇮", "Cameroon": "🇨🇲",
+  "South Africa": "🇿🇦", "Mali": "🇲🇱", "DR Congo": "🇨🇩", "Saudi Arabia": "🇸🇦", "Qatar": "🇶🇦"
+};
+
+function nationalityFlag(nationality) {
+  return NATIONALITY_FLAGS[nationality] || "";
+}
+
 async function renderTeamSquadTab(teamId, teamName) {
   const manual = MANUAL_SQUADS[teamName];
   const isManual = Array.isArray(manual) && manual.length > 0;
 
   let squad;
   if (isManual) {
-    squad = manual.map(p => ({ strPlayer: p.name, strPosition: p.position || "", strNumber: p.number || "", strCutout: "", strThumb: "" }));
+    squad = manual.map(p => ({
+      name: p.name, position: p.position || "", number: p.number || "",
+      age: p.age || null, nationality: p.nationality || "", photo: ""
+    }));
   } else {
-    squad = teamSquadCache[teamId];
-    if (!squad) {
+    let raw = teamSquadCache[teamId];
+    if (!raw) {
       const data = await fetchJsonWithRetry(`${SPORTSDB_BASE}/lookup_all_players.php?id=${teamId}`);
-      squad = Array.isArray(data.player) ? data.player : [];
-      teamSquadCache[teamId] = squad;
+      raw = Array.isArray(data.player) ? data.player : [];
+      teamSquadCache[teamId] = raw;
     }
+    squad = raw.map(p => ({
+      name: p.strPlayer, position: p.strPosition || "", number: p.strNumber || "",
+      age: calcAge(p.dateBorn), nationality: p.strNationality || "", photo: p.strCutout || p.strThumb || ""
+    }));
   }
   if (squad.length === 0) {
-    return `<div class="team-no-fixture">Squad isn't published for this team on our free data source.</div>`;
+    return `<div class="team-no-fixture">Squad data coming soon for ${teamName}.</div>`;
   }
 
   const groups = { Goalkeepers: [], Defenders: [], Midfielders: [], Forwards: [], "Coaching Staff": [] };
-  squad.forEach(p => groups[squadPositionGroup(p.strPosition)].push(p));
+  squad.forEach(p => groups[squadPositionGroup(p.position)].push(p));
 
-  const renderPlayer = p => `
-    <div class="lineup-player">
-      ${badgeImg(p.strCutout || p.strThumb || "", p.strPlayer, "lineup-photo")}
-      ${p.strNumber ? `<span class="lineup-number">${p.strNumber}</span>` : ""}
-      <span class="lineup-name">${p.strPlayer}</span>
-      <span class="lineup-position">${p.strPosition || ""}</span>
-    </div>`;
+  const renderPlayer = p => {
+    const meta = [p.age ? `${p.age}y` : "", p.nationality ? `${nationalityFlag(p.nationality)} ${p.nationality}`.trim() : ""].filter(Boolean).join(" · ");
+    return `
+      <div class="lineup-player">
+        ${badgeImg(p.photo, p.name, "lineup-photo")}
+        ${p.number ? `<span class="lineup-number">${p.number}</span>` : ""}
+        <span class="lineup-name">${p.name}</span>
+        ${meta ? `<span class="lineup-meta">${meta}</span>` : ""}
+        <span class="lineup-position">${p.position || ""}</span>
+      </div>`;
+  };
 
   const sections = Object.entries(groups)
     .filter(([, list]) => list.length > 0)
@@ -1211,10 +1616,12 @@ const matchTabCache = {};
 function seasonStringForLeague(league, dateStr) {
   const d = new Date(dateStr + "T00:00:00");
   // Calendar-year leagues — confirmed against TheSportsDB's own
-  // strCurrentSeason for each (Brasileirao: "2026", Argentina: "2026" —
-  // despite MLS also running March-December, its own metadata reports
-  // "2026-2027", so MLS uses the default Aug-cutoff format below).
-  if (league === "Brasileirao" || league === "Liga Profesional Argentina") return String(d.getFullYear());
+  // strCurrentSeason for each (Brasileirao/Brazil Serie B: "2026",
+  // Argentina leagues: "2026", Sweden/Norway top flights: "2026" — despite
+  // MLS also running March-December, its own metadata reports "2026-2027",
+  // so MLS uses the default Aug-cutoff format below).
+  const CALENDAR_YEAR_LEAGUES = ["Brasileirao", "Liga Profesional Argentina", "Brazil Serie B", "Argentina Primera Nacional", "Sweden Allsvenskan", "Norway Eliteserien"];
+  if (CALENDAR_YEAR_LEAGUES.includes(league)) return String(d.getFullYear());
   const year = d.getMonth() >= 6 ? d.getFullYear() : d.getFullYear() - 1;
   return `${year}-${year + 1}`;
 }

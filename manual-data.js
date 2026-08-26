@@ -17,11 +17,13 @@
 // Format per player: { number: "10", name: "Player Name", position: "Forward" }
 // "position" just needs to contain one of: goalkeeper / back or defender /
 // midfield / wing, forward, or striker — anything else is grouped as staff.
+// "age" (a number) and "nationality" (a country name) are optional — leave
+// them out if you don't have them, the site just won't show that detail.
 //
 // Example (delete before filling in real data):
 // const MANUAL_SQUADS = {
 //   "Arsenal": [
-//     { number: "1", name: "David Raya", position: "Goalkeeper" },
+//     { number: "1", name: "David Raya", position: "Goalkeeper", age: 30, nationality: "Spain" },
 //     { number: "4", name: "Ben White", position: "Right-Back" },
 //     { number: "7", name: "Bukayo Saka", position: "Right Winger" }
 //   ]

@@ -33,9 +33,23 @@
     <!-- CENTER -->
     <main class="content glass">
       <div class="date-bar">
-        <button id="prevDay" class="date-btn" aria-label="Previous day">‹</button>
-        <span class="date-label">Today</span>
-        <button id="nextDay" class="date-btn" aria-label="Next day">›</button>
+        <button id="liveBtn" class="live-nav-btn" onclick="jumpToLive()" aria-label="Jump to live matches">
+          <span class="live-dot"></span>LIVE
+        </button>
+        <div class="date-nav">
+          <button id="prevDay" class="date-btn" aria-label="Previous day">‹</button>
+          <span class="date-label">Today</span>
+          <button id="nextDay" class="date-btn" aria-label="Next day">›</button>
+        </div>
+        <div class="calendar-nav-btn" id="calendarBtn" aria-label="Pick a date">
+          <span class="calendar-icon">📅</span>
+          <span class="calendar-day-num" id="calendarDayNum"></span>
+          <input type="date" id="datePickerInput" class="date-picker-input" aria-label="Choose date" onchange="if(this.value) loadMatchesForDate(new Date(this.value + 'T00:00:00'))">
+        </div>
+      </div>
+      <div class="view-toggle">
+        <button id="viewMatchesBtn" class="view-toggle-btn active" onclick="setViewMode('matches')">All Matches</button>
+        <button id="viewTeamsBtn" class="view-toggle-btn" onclick="setViewMode('teams')">All Teams</button>
       </div>
       <div id="matches"></div>
     </main>
