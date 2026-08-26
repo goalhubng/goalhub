@@ -990,7 +990,7 @@ const SPORTSDB_BASE = `https://www.thesportsdb.com/api/v1/json/${SPORTSDB_KEY}`;
 
 // Our own Cloudflare Worker, hosting the per-match chat + prediction rooms
 // (see api-proxy/worker.js — the ChatRoom Durable Object).
-const CHAT_WORKER_BASE = "https://goalhub-api-proxy.betterdays-goalhub.workers.dev";
+const CHAT_WORKER_BASE = "https://goalhub-api-proxy.betterdays-goalhub.workers.dev"
 
 // --- Auth: email magic-link login (see api-proxy/worker.js for the server
 // side). The JWT is the only thing that proves who's signed in — it's kept
