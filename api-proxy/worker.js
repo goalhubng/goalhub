@@ -186,33 +186,57 @@ async function handleSendMagicLink(request, env) {
   const origin = request.headers.get("Origin") || "https://goalhub.pages.dev";
   const magicLink = `${origin}/?auth_token=${token}`;
 
-  let emailSent = false;
-  if (env.EMAIL) {
-    try {
-      await env.EMAIL.send({
-        to: email,
-        from: { email: "login@goalhub.pages.dev", name: "GoalHub" },
-        subject: "Your GoalHub sign-in link",
-        html: `<p>Click to sign in to GoalHub (expires in 15 minutes):</p><p><a href="${magicLink}">${magicLink}</a></p>`,
-        text: `Sign in to GoalHub: ${magicLink} (expires in 15 minutes)`
-      });
-      emailSent = true;
-    } catch (err) {
-      // Expected until a real domain is onboarded for Email Sending — see
-      // schema.sql's header comment. Falls through to the dev-mode response.
-      emailSent = false;
-    }
-  }
+  const emailSent = await sendMagicLinkEmail(env, email, magicLink);
 
-  // Dev-mode fallback: no domain is onboarded for Email Sending yet, so the
-  // link can't actually be delivered. Returning it directly lets the login
-  // flow be tested end-to-end today; once emailSent is reliably true this
-  // branch stops firing on its own and the link stops being exposed here.
+  // Dev-mode fallback: if Resend isn't configured (or a send fails), return
+  // the link directly so the login flow can still be tested end-to-end.
+  // Once RESEND_API_KEY is set and sending works, this stops firing and the
+  // link stops being exposed here.
   return jsonResponse({
     ok: true,
     emailSent,
     ...(emailSent ? {} : { devMagicLink: magicLink })
   });
+}
+
+// Resend's onboarding@resend.dev sender works with zero domain setup — the
+// tradeoff (per Resend's own docs) is it can only deliver to the email
+// address on the Resend account itself until a real domain is verified.
+// Sending to any other address fails there, not in this code.
+async function sendMagicLinkEmail(env, toEmail, magicLink) {
+  if (!env.RESEND_API_KEY) return false;
+  try {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${env.RESEND_API_KEY}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        from: "GoalHub <onboarding@resend.dev>",
+        to: toEmail,
+        subject: "Your GoalHub Sign-in Link",
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto;">
+            <h2 style="color: #0a1a12;">Sign in to GoalHub</h2>
+            <p style="color: #444;">Click the button below to sign in. This link expires in 15 minutes.</p>
+            <p style="text-align: center; margin: 32px 0;">
+              <a href="${magicLink}" style="background: #00e676; color: #04140c; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block;">Sign in to GoalHub</a>
+            </p>
+            <p style="color: #888; font-size: 13px;">If the button doesn't work, copy this link: <a href="${magicLink}">${magicLink}</a></p>
+          </div>`,
+        text: `Sign in to GoalHub: ${magicLink} (expires in 15 minutes)`
+      })
+    });
+    if (!res.ok) {
+      console.error("Resend send failed", res.status, await res.text());
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error("Resend send threw", err);
+    return false;
+  }
 }
 
 async function handleVerify(url, env) {
