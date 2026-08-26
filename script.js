@@ -345,46 +345,46 @@ const allTeams = [
   // AUSTRIAN BUNDESLIGA - 12, real teams from openfootball's 2025-26 season data (no key needed); logos left blank pending individual verification, using the initials-avatar fallback.
   {name: "Austria Wien", league: "Austrian Bundesliga", logo: ""},
   {name: "FC Blau Weiß Linz", league: "Austrian Bundesliga", logo: ""},
-  {name: "Grazer AK", league: "Austrian Bundesliga", logo: ""},
-  {name: "LASK", league: "Austrian Bundesliga", logo: ""},
+  {name: "Grazer AK", league: "Austrian Bundesliga", logo: "https://r2.thesportsdb.com/images/media/team/badge/43rocv1750352978.png"},
+  {name: "LASK", league: "Austrian Bundesliga", logo: "https://r2.thesportsdb.com/images/media/team/badge/oox26l1683556395.png"},
   {name: "RB Salzburg", league: "Austrian Bundesliga", logo: ""},
   {name: "Rapid Wien", league: "Austrian Bundesliga", logo: ""},
-  {name: "SCR Altach", league: "Austrian Bundesliga", logo: ""},
-  {name: "SV Ried", league: "Austrian Bundesliga", logo: ""},
-  {name: "Sturm Graz", league: "Austrian Bundesliga", logo: ""},
-  {name: "TSV Hartberg", league: "Austrian Bundesliga", logo: ""},
+  {name: "SCR Altach", league: "Austrian Bundesliga", logo: "https://r2.thesportsdb.com/images/media/team/badge/2hit6x1750352012.png"},
+  {name: "SV Ried", league: "Austrian Bundesliga", logo: "https://r2.thesportsdb.com/images/media/team/badge/c1bxyq1583516636.png"},
+  {name: "Sturm Graz", league: "Austrian Bundesliga", logo: "https://r2.thesportsdb.com/images/media/team/badge/ppg0j71578585847.png"},
+  {name: "TSV Hartberg", league: "Austrian Bundesliga", logo: "https://r2.thesportsdb.com/images/media/team/badge/72c0xg1578833261.png"},
   {name: "WSG Tirol", league: "Austrian Bundesliga", logo: ""},
   {name: "Wolfsberger AC", league: "Austrian Bundesliga", logo: ""},
 
   // AUSTRIAN ERSTE LIGA - 16, real teams from openfootball's 2025-26 season data (no key needed); logos left blank pending individual verification, using the initials-avatar fallback.
   {name: "Austria Lustenau", league: "Austrian Erste Liga", logo: ""},
-  {name: "Austria Salzburg", league: "Austrian Erste Liga", logo: ""},
+  {name: "Austria Salzburg", league: "Austrian Erste Liga", logo: "https://r2.thesportsdb.com/images/media/team/badge/rjahu01782841316.png"},
   {name: "Austria Wien II", league: "Austrian Erste Liga", logo: ""},
-  {name: "FC Admira Wacker", league: "Austrian Erste Liga", logo: ""},
-  {name: "FC Hertha Wels", league: "Austrian Erste Liga", logo: ""},
-  {name: "FC Liefering", league: "Austrian Erste Liga", logo: ""},
-  {name: "First Vienna", league: "Austrian Erste Liga", logo: ""},
-  {name: "Floridsdorfer AC", league: "Austrian Erste Liga", logo: ""},
+  {name: "FC Admira Wacker", league: "Austrian Erste Liga", logo: "https://r2.thesportsdb.com/images/media/team/badge/d5m6cv1722794864.png"},
+  {name: "FC Hertha Wels", league: "Austrian Erste Liga", logo: "https://r2.thesportsdb.com/images/media/team/badge/o4zhsq1720339285.png"},
+  {name: "FC Liefering", league: "Austrian Erste Liga", logo: "https://r2.thesportsdb.com/images/media/team/badge/2u0bb91583516567.png"},
+  {name: "First Vienna", league: "Austrian Erste Liga", logo: "https://r2.thesportsdb.com/images/media/team/badge/9ca40j1603308320.png"},
+  {name: "Floridsdorfer AC", league: "Austrian Erste Liga", logo: "https://r2.thesportsdb.com/images/media/team/badge/8997wz1722795176.png"},
   {name: "Kapfenberger SV 1919", league: "Austrian Erste Liga", logo: ""},
-  {name: "Rapid Wien II", league: "Austrian Erste Liga", logo: ""},
+  {name: "Rapid Wien II", league: "Austrian Erste Liga", logo: "https://r2.thesportsdb.com/images/media/team/badge/ebwdmz1782841141.png"},
   {name: "SK Austria Klagenfurt", league: "Austrian Erste Liga", logo: ""},
   {name: "SKN St. Pölten", league: "Austrian Erste Liga", logo: ""},
   {name: "SKU Amstetten", league: "Austrian Erste Liga", logo: ""},
   {name: "SV Stripfing/Weiden", league: "Austrian Erste Liga", logo: ""},
-  {name: "Schwarz-Weiß Bregenz", league: "Austrian Erste Liga", logo: ""},
+  {name: "Schwarz-Weiß Bregenz", league: "Austrian Erste Liga", logo: "https://r2.thesportsdb.com/images/media/team/badge/6b0b1d1657897157.png"},
   {name: "Sturm Graz II", league: "Austrian Erste Liga", logo: ""},
 
   // EFL CHAMPIONSHIP - 24, real teams from openfootball's 2025-26 season data (no key needed); logos left blank pending individual verification, using the initials-avatar fallback.
-  {name: "Birmingham City", league: "EFL Championship", logo: ""},
-  {name: "Blackburn Rovers", league: "EFL Championship", logo: ""},
-  {name: "Bristol City", league: "EFL Championship", logo: ""},
-  {name: "Charlton Athletic", league: "EFL Championship", logo: ""},
+  {name: "Birmingham City", league: "EFL Championship", logo: "https://r2.thesportsdb.com/images/media/team/badge/wufs551672950865.png"},
+  {name: "Blackburn Rovers", league: "EFL Championship", logo: "https://r2.thesportsdb.com/images/media/team/badge/rvryut1448810814.png"},
+  {name: "Bristol City", league: "EFL Championship", logo: "https://r2.thesportsdb.com/images/media/team/badge/0ejxwz1601721013.png"},
+  {name: "Charlton Athletic", league: "EFL Championship", logo: "https://r2.thesportsdb.com/images/media/team/badge/o08wvi1635872307.png"},
   {name: "Coventry City", league: "EFL Championship", logo: ""},
-  {name: "Derby County", league: "EFL Championship", logo: ""},
+  {name: "Derby County", league: "EFL Championship", logo: "https://r2.thesportsdb.com/images/media/team/badge/jioo4z1557155744.png"},
   {name: "Hull City", league: "EFL Championship", logo: ""},
   {name: "Ipswich Town", league: "EFL Championship", logo: ""},
   {name: "Leicester City", league: "EFL Championship", logo: ""},
-  {name: "Middlesbrough", league: "EFL Championship", logo: ""},
+  {name: "Middlesbrough", league: "EFL Championship", logo: "https://r2.thesportsdb.com/images/media/team/badge/advjg71780068902.png"},
   {name: "Millwall", league: "EFL Championship", logo: ""},
   {name: "Norwich City", league: "EFL Championship", logo: ""},
   {name: "Oxford United", league: "EFL Championship", logo: ""},
@@ -402,14 +402,14 @@ const allTeams = [
 
   // LA LIGA 2 - 22, real teams from openfootball's 2025-26 season data (no key needed); logos left blank pending individual verification, using the initials-avatar fallback.
   {name: "AD Ceuta", league: "La Liga 2", logo: ""},
-  {name: "Albacete", league: "La Liga 2", logo: ""},
-  {name: "Burgos CF", league: "La Liga 2", logo: ""},
-  {name: "CD Castellón", league: "La Liga 2", logo: ""},
+  {name: "Albacete", league: "La Liga 2", logo: "https://r2.thesportsdb.com/images/media/team/badge/17oqja1616436316.png"},
+  {name: "Burgos CF", league: "La Liga 2", logo: "https://r2.thesportsdb.com/images/media/team/badge/79h3ul1708150894.png"},
+  {name: "CD Castellón", league: "La Liga 2", logo: "https://r2.thesportsdb.com/images/media/team/badge/ywibjw1733456820.png"},
   {name: "CD Leganés", league: "La Liga 2", logo: ""},
   {name: "CD Mirandés", league: "La Liga 2", logo: ""},
   {name: "Cultural Leonesa", league: "La Liga 2", logo: ""},
-  {name: "Cádiz CF", league: "La Liga 2", logo: ""},
-  {name: "Córdoba CF", league: "La Liga 2", logo: ""},
+  {name: "Cádiz CF", league: "La Liga 2", logo: "https://r2.thesportsdb.com/images/media/team/badge/e2phzp1639408503.png"},
+  {name: "Córdoba CF", league: "La Liga 2", logo: "https://r2.thesportsdb.com/images/media/team/badge/ttyyvy1473503827.png"},
   {name: "Deportivo La Coruña", league: "La Liga 2", logo: ""},
   {name: "FC Andorra", league: "La Liga 2", logo: ""},
   {name: "Granada CF", league: "La Liga 2", logo: ""},
@@ -431,7 +431,7 @@ const allTeams = [
   {name: "Clermont Foot 63", league: "Ligue 2", logo: ""},
   {name: "EA Guingamp", league: "Ligue 2", logo: ""},
   {name: "ESTAC Troyes", league: "Ligue 2", logo: ""},
-  {name: "FC Annecy", league: "Ligue 2", logo: ""},
+  {name: "FC Annecy", league: "Ligue 2", logo: "https://r2.thesportsdb.com/images/media/team/badge/h6981f1655120883.png"},
   {name: "Grenoble Foot 38", league: "Ligue 2", logo: ""},
   {name: "Le Mans", league: "Ligue 2", logo: ""},
   {name: "Montpellier HSC", league: "Ligue 2", logo: ""},
@@ -449,9 +449,9 @@ const allTeams = [
   {name: "AC Reggiana 1919", league: "Serie B", logo: ""},
   {name: "Calcio Padova", league: "Serie B", logo: ""},
   {name: "Carrarese Calcio", league: "Serie B", logo: ""},
-  {name: "Cesena", league: "Serie B", logo: ""},
+  {name: "Cesena", league: "Serie B", logo: "https://r2.thesportsdb.com/images/media/team/badge/9l00zr1677256723.png"},
   {name: "Delfino Pescara", league: "Serie B", logo: ""},
-  {name: "Empoli", league: "Serie B", logo: ""},
+  {name: "Empoli", league: "Serie B", logo: "https://r2.thesportsdb.com/images/media/team/badge/c1ie6b1622561483.png"},
   {name: "FC Südtirol", league: "Serie B", logo: ""},
   {name: "Frosinone Calcio", league: "Serie B", logo: ""},
   {name: "Juve Stabia", league: "Serie B", logo: ""},
@@ -470,12 +470,12 @@ const allTeams = [
   {name: "1. FC Kaiserslautern", league: "2. Bundesliga", logo: ""},
   {name: "1. FC Magdeburg", league: "2. Bundesliga", logo: ""},
   {name: "1. FC Nürnberg", league: "2. Bundesliga", logo: ""},
-  {name: "Arminia Bielefeld", league: "2. Bundesliga", logo: ""},
-  {name: "Dynamo Dresden", league: "2. Bundesliga", logo: ""},
-  {name: "Eintracht Braunschweig", league: "2. Bundesliga", logo: ""},
+  {name: "Arminia Bielefeld", league: "2. Bundesliga", logo: "https://r2.thesportsdb.com/images/media/team/badge/xrrwpx1447591964.png"},
+  {name: "Dynamo Dresden", league: "2. Bundesliga", logo: "https://r2.thesportsdb.com/images/media/team/badge/0vfmdu1783231141.png"},
+  {name: "Eintracht Braunschweig", league: "2. Bundesliga", logo: "https://r2.thesportsdb.com/images/media/team/badge/lrrq0z1599820707.png"},
   {name: "FC Schalke 04", league: "2. Bundesliga", logo: ""},
   {name: "Fortuna Düsseldorf", league: "2. Bundesliga", logo: ""},
-  {name: "Hannover 96", league: "2. Bundesliga", logo: ""},
+  {name: "Hannover 96", league: "2. Bundesliga", logo: "https://r2.thesportsdb.com/images/media/team/badge/tqpqqv1473454148.png"},
   {name: "Hertha BSC", league: "2. Bundesliga", logo: ""},
   {name: "Holstein Kiel", league: "2. Bundesliga", logo: ""},
   {name: "Karlsruher SC", league: "2. Bundesliga", logo: ""},
@@ -486,17 +486,17 @@ const allTeams = [
   {name: "SpVgg Greuther Fürth", league: "2. Bundesliga", logo: ""},
   {name: "VfL Bochum", league: "2. Bundesliga", logo: ""},
   // Nigeria NPFL (20 teams)
-  {name: "Abia Warriors", league: "Nigeria NPFL", logo: ""},
-  {name: "Barau", league: "Nigeria NPFL", logo: ""},
+  {name: "Abia Warriors", league: "Nigeria NPFL", logo: "https://r2.thesportsdb.com/images/media/team/badge/getpvo1590183315.png"},
+  {name: "Barau", league: "Nigeria NPFL", logo: "https://r2.thesportsdb.com/images/media/team/badge/5mk51u1755988518.png"},
   {name: "Bayelsa United", league: "Nigeria NPFL", logo: ""},
-  {name: "Bendel Insurance", league: "Nigeria NPFL", logo: ""},
+  {name: "Bendel Insurance", league: "Nigeria NPFL", logo: "https://r2.thesportsdb.com/images/media/team/badge/p5th3c1714520172.png"},
   {name: "El-Kanemi Warriors", league: "Nigeria NPFL", logo: ""},
   {name: "Enugu Rangers", league: "Nigeria NPFL", logo: ""},
-  {name: "Enyimba", league: "Nigeria NPFL", logo: ""},
-  {name: "Ikorodu City", league: "Nigeria NPFL", logo: ""},
-  {name: "Kano Pillars", league: "Nigeria NPFL", logo: ""},
-  {name: "Katsina United", league: "Nigeria NPFL", logo: ""},
-  {name: "Kun Khalifat", league: "Nigeria NPFL", logo: ""},
+  {name: "Enyimba", league: "Nigeria NPFL", logo: "https://r2.thesportsdb.com/images/media/team/badge/uiz3l01786855143.png"},
+  {name: "Ikorodu City", league: "Nigeria NPFL", logo: "https://r2.thesportsdb.com/images/media/team/badge/p05jag1721754543.png"},
+  {name: "Kano Pillars", league: "Nigeria NPFL", logo: "https://r2.thesportsdb.com/images/media/team/badge/bgleh01589375519.png"},
+  {name: "Katsina United", league: "Nigeria NPFL", logo: "https://r2.thesportsdb.com/images/media/team/badge/oyajem1590185640.png"},
+  {name: "Kun Khalifat", league: "Nigeria NPFL", logo: "https://r2.thesportsdb.com/images/media/team/badge/0hhm211755988471.png"},
   {name: "Kwara United", league: "Nigeria NPFL", logo: ""},
   {name: "Nasarawa United", league: "Nigeria NPFL", logo: ""},
   {name: "Niger Tornadoes", league: "Nigeria NPFL", logo: ""},
@@ -511,10 +511,10 @@ const allTeams = [
   {name: "America Mineiro", league: "Brazil Serie B", logo: ""},
   {name: "Athletic", league: "Brazil Serie B", logo: ""},
   {name: "Avai", league: "Brazil Serie B", logo: ""},
-  {name: "Botafogo-SP", league: "Brazil Serie B", logo: ""},
+  {name: "Botafogo-SP", league: "Brazil Serie B", logo: "https://r2.thesportsdb.com/images/media/team/badge/kg3xsd1701366652.png"},
   {name: "Chapecoense", league: "Brazil Serie B", logo: ""},
   {name: "Coritiba", league: "Brazil Serie B", logo: ""},
-  {name: "CRB", league: "Brazil Serie B", logo: ""},
+  {name: "CRB", league: "Brazil Serie B", logo: "https://r2.thesportsdb.com/images/media/team/badge/vpypuq1472069179.png"},
   {name: "Ferroviaria", league: "Brazil Serie B", logo: ""},
   {name: "Goias", league: "Brazil Serie B", logo: ""},
   {name: "Novorizontino", league: "Brazil Serie B", logo: ""},
@@ -524,16 +524,16 @@ const allTeams = [
   {name: "Vila Nova", league: "Brazil Serie B", logo: ""},
   {name: "Volta Redonda", league: "Brazil Serie B", logo: ""},
   // Argentina Primera Nacional (35 teams — Godoy Cruz already listed under Liga Profesional Argentina, excluded here)
-  {name: "Acassuso", league: "Argentina Primera Nacional", logo: ""},
+  {name: "Acassuso", league: "Argentina Primera Nacional", logo: "https://r2.thesportsdb.com/images/media/team/badge/81kew41677993637.png"},
   {name: "Agropecuario Argentino", league: "Argentina Primera Nacional", logo: ""},
-  {name: "All Boys", league: "Argentina Primera Nacional", logo: ""},
-  {name: "Almagro", league: "Argentina Primera Nacional", logo: ""},
-  {name: "Almirante Brown", league: "Argentina Primera Nacional", logo: ""},
-  {name: "Atlanta", league: "Argentina Primera Nacional", logo: ""},
+  {name: "All Boys", league: "Argentina Primera Nacional", logo: "https://r2.thesportsdb.com/images/media/team/badge/zo4vm01578824142.png"},
+  {name: "Almagro", league: "Argentina Primera Nacional", logo: "https://r2.thesportsdb.com/images/media/team/badge/zv7sju1578825975.png"},
+  {name: "Almirante Brown", league: "Argentina Primera Nacional", logo: "https://r2.thesportsdb.com/images/media/team/badge/81i8mf1615822788.png"},
+  {name: "Atlanta", league: "Argentina Primera Nacional", logo: "https://r2.thesportsdb.com/images/media/team/badge/ey0i4o1775792685.png"},
   {name: "Atletico de Rafaela", league: "Argentina Primera Nacional", logo: ""},
-  {name: "Central Norte", league: "Argentina Primera Nacional", logo: ""},
-  {name: "Chacarita Juniors", league: "Argentina Primera Nacional", logo: ""},
-  {name: "Chaco For Ever", league: "Argentina Primera Nacional", logo: ""},
+  {name: "Central Norte", league: "Argentina Primera Nacional", logo: "https://r2.thesportsdb.com/images/media/team/badge/b0uo2b1678853683.png"},
+  {name: "Chacarita Juniors", league: "Argentina Primera Nacional", logo: "https://r2.thesportsdb.com/images/media/team/badge/pjam301511624231.png"},
+  {name: "Chaco For Ever", league: "Argentina Primera Nacional", logo: "https://r2.thesportsdb.com/images/media/team/badge/9wxhp31678848859.png"},
   {name: "Ciudad de Bolivar", league: "Argentina Primera Nacional", logo: ""},
   {name: "Colegiales", league: "Argentina Primera Nacional", logo: ""},
   {name: "Colon", league: "Argentina Primera Nacional", logo: ""},
@@ -562,10 +562,10 @@ const allTeams = [
   // Turkey 1.Lig (16 teams — Adana Demirspor, Hatayspor, Pendikspor, Sivasspor already listed under Super Lig, excluded here)
   {name: "Amedspor", league: "Turkey 1.Lig", logo: ""},
   {name: "Bandirmaspor", league: "Turkey 1.Lig", logo: ""},
-  {name: "Bodrum", league: "Turkey 1.Lig", logo: ""},
-  {name: "Boluspor", league: "Turkey 1.Lig", logo: ""},
+  {name: "Bodrum", league: "Turkey 1.Lig", logo: "https://r2.thesportsdb.com/images/media/team/badge/2njed61657195683.png"},
+  {name: "Boluspor", league: "Turkey 1.Lig", logo: "https://r2.thesportsdb.com/images/media/team/badge/5uv4ni1657195692.png"},
   {name: "Corum", league: "Turkey 1.Lig", logo: ""},
-  {name: "Esenler Erokspor", league: "Turkey 1.Lig", logo: ""},
+  {name: "Esenler Erokspor", league: "Turkey 1.Lig", logo: "https://r2.thesportsdb.com/images/media/team/badge/107ke31657455566.png"},
   {name: "Erzurumspor", league: "Turkey 1.Lig", logo: ""},
   {name: "Istanbulspor", league: "Turkey 1.Lig", logo: ""},
   {name: "Igdir", league: "Turkey 1.Lig", logo: ""},
@@ -579,16 +579,16 @@ const allTeams = [
   // Poland Ekstraklasa (18 teams)
   {name: "Arka Gdynia", league: "Poland Ekstraklasa", logo: ""},
   {name: "Bruk-Bet Termalica Nieciecza", league: "Poland Ekstraklasa", logo: ""},
-  {name: "Cracovia", league: "Poland Ekstraklasa", logo: ""},
-  {name: "GKS Katowice", league: "Poland Ekstraklasa", logo: ""},
+  {name: "Cracovia", league: "Poland Ekstraklasa", logo: "https://r2.thesportsdb.com/images/media/team/badge/bgqbo51714200086.png"},
+  {name: "GKS Katowice", league: "Poland Ekstraklasa", logo: "https://r2.thesportsdb.com/images/media/team/badge/zsva1p1626103599.png"},
   {name: "Gornik Zabrze", league: "Poland Ekstraklasa", logo: ""},
   {name: "Jagiellonia Bialystok", league: "Poland Ekstraklasa", logo: ""},
-  {name: "Korona Kielce", league: "Poland Ekstraklasa", logo: ""},
+  {name: "Korona Kielce", league: "Poland Ekstraklasa", logo: "https://r2.thesportsdb.com/images/media/team/badge/ytpvtv1448218305.png"},
   {name: "Lech Poznan", league: "Poland Ekstraklasa", logo: ""},
   {name: "Lechia Gdansk", league: "Poland Ekstraklasa", logo: ""},
-  {name: "Legia Warsaw", league: "Poland Ekstraklasa", logo: ""},
-  {name: "Motor Lublin", league: "Poland Ekstraklasa", logo: ""},
-  {name: "Piast Gliwice", league: "Poland Ekstraklasa", logo: ""},
+  {name: "Legia Warsaw", league: "Poland Ekstraklasa", logo: "https://r2.thesportsdb.com/images/media/team/badge/c969ez1632775656.png"},
+  {name: "Motor Lublin", league: "Poland Ekstraklasa", logo: "https://r2.thesportsdb.com/images/media/team/badge/7qevx11720351099.png"},
+  {name: "Piast Gliwice", league: "Poland Ekstraklasa", logo: "https://r2.thesportsdb.com/images/media/team/badge/qywuux1448219182.png"},
   {name: "Pogon Szczecin", league: "Poland Ekstraklasa", logo: ""},
   {name: "Radomiak Radom", league: "Poland Ekstraklasa", logo: ""},
   {name: "Rakow Czestochowa", league: "Poland Ekstraklasa", logo: ""},
@@ -597,38 +597,38 @@ const allTeams = [
   {name: "Zaglebie Lubin", league: "Poland Ekstraklasa", logo: ""},
   // Belgium Challenger Pro (14 teams — Beerschot already listed under Jupiler Pro, excluded here)
   {name: "Virton", league: "Belgium Challenger Pro", logo: ""},
-  {name: "Lokeren", league: "Belgium Challenger Pro", logo: ""},
-  {name: "Eupen", league: "Belgium Challenger Pro", logo: ""},
-  {name: "Club NXT", league: "Belgium Challenger Pro", logo: ""},
+  {name: "Lokeren", league: "Belgium Challenger Pro", logo: "https://r2.thesportsdb.com/images/media/team/badge/ucnjho1782107350.png"},
+  {name: "Eupen", league: "Belgium Challenger Pro", logo: "https://r2.thesportsdb.com/images/media/team/badge/tyvrty1464539199.png"},
+  {name: "Club NXT", league: "Belgium Challenger Pro", logo: "https://r2.thesportsdb.com/images/media/team/badge/3284wh1687872002.png"},
   {name: "Dender EH", league: "Belgium Challenger Pro", logo: ""},
-  {name: "Francs Borains", league: "Belgium Challenger Pro", logo: ""},
+  {name: "Francs Borains", league: "Belgium Challenger Pro", logo: "https://r2.thesportsdb.com/images/media/team/badge/22btbw1687871590.png"},
   {name: "Hasselt", league: "Belgium Challenger Pro", logo: ""},
   {name: "Patro Eisden Maasmechelen", league: "Belgium Challenger Pro", logo: ""},
-  {name: "Lierse", league: "Belgium Challenger Pro", logo: ""},
+  {name: "Lierse", league: "Belgium Challenger Pro", logo: "https://r2.thesportsdb.com/images/media/team/badge/snsyuk1597005625.png"},
   {name: "RFC Liege", league: "Belgium Challenger Pro", logo: ""},
-  {name: "RSCA Futures", league: "Belgium Challenger Pro", logo: ""},
+  {name: "RSCA Futures", league: "Belgium Challenger Pro", logo: "https://r2.thesportsdb.com/images/media/team/badge/hque4l1782021344.png"},
   {name: "Seraing", league: "Belgium Challenger Pro", logo: ""},
-  {name: "Jong Genk", league: "Belgium Challenger Pro", logo: ""},
+  {name: "Jong Genk", league: "Belgium Challenger Pro", logo: "https://r2.thesportsdb.com/images/media/team/badge/lan0qu1655569364.png"},
   {name: "Jong KAA Gent", league: "Belgium Challenger Pro", logo: ""},
   // Denmark Superliga (12 teams)
   {name: "AGF", league: "Denmark Superliga", logo: ""},
   {name: "Brondby", league: "Denmark Superliga", logo: ""},
-  {name: "Copenhagen", league: "Denmark Superliga", logo: ""},
+  {name: "Copenhagen", league: "Denmark Superliga", logo: "https://r2.thesportsdb.com/images/media/team/badge/styqtr1473535513.png"},
   {name: "Fredericia", league: "Denmark Superliga", logo: ""},
-  {name: "Midtjylland", league: "Denmark Superliga", logo: ""},
+  {name: "Midtjylland", league: "Denmark Superliga", logo: "https://r2.thesportsdb.com/images/media/team/badge/s5bpcr1755712262.png"},
   {name: "Nordsjaelland", league: "Denmark Superliga", logo: ""},
   {name: "OB", league: "Denmark Superliga", logo: ""},
-  {name: "Randers", league: "Denmark Superliga", logo: ""},
+  {name: "Randers", league: "Denmark Superliga", logo: "https://r2.thesportsdb.com/images/media/team/badge/w0kmhn1690407779.png"},
   {name: "Silkeborg", league: "Denmark Superliga", logo: ""},
   {name: "Sonderjyske", league: "Denmark Superliga", logo: ""},
   {name: "Vejle", league: "Denmark Superliga", logo: ""},
   {name: "Viborg", league: "Denmark Superliga", logo: ""},
   // Sweden Allsvenskan (16 teams)
-  {name: "AIK", league: "Sweden Allsvenskan", logo: ""},
+  {name: "AIK", league: "Sweden Allsvenskan", logo: "https://r2.thesportsdb.com/images/media/team/badge/rwsrxq1420769503.png"},
   {name: "BK Hacken", league: "Sweden Allsvenskan", logo: ""},
   {name: "Degerfors IF", league: "Sweden Allsvenskan", logo: ""},
   {name: "Djurgardens IF", league: "Sweden Allsvenskan", logo: ""},
-  {name: "GAIS", league: "Sweden Allsvenskan", logo: ""},
+  {name: "GAIS", league: "Sweden Allsvenskan", logo: "https://r2.thesportsdb.com/images/media/team/badge/3pahks1639779139.png"},
   {name: "Halmstads BK", league: "Sweden Allsvenskan", logo: ""},
   {name: "Hammarby IF", league: "Sweden Allsvenskan", logo: ""},
   {name: "IF Brommapojkarna", league: "Sweden Allsvenskan", logo: ""},
@@ -641,16 +641,16 @@ const allTeams = [
   {name: "Orgryte IS", league: "Sweden Allsvenskan", logo: ""},
   {name: "Vasteras SK", league: "Sweden Allsvenskan", logo: ""},
   // Norway Eliteserien (16 teams)
-  {name: "Aalesund", league: "Norway Eliteserien", logo: ""},
+  {name: "Aalesund", league: "Norway Eliteserien", logo: "https://r2.thesportsdb.com/images/media/team/badge/s1br7q1602448285.png"},
   {name: "Bodo/Glimt", league: "Norway Eliteserien", logo: ""},
-  {name: "Brann", league: "Norway Eliteserien", logo: ""},
-  {name: "Fredrikstad", league: "Norway Eliteserien", logo: ""},
+  {name: "Brann", league: "Norway Eliteserien", logo: "https://r2.thesportsdb.com/images/media/team/badge/ovuad71690695412.png"},
+  {name: "Fredrikstad", league: "Norway Eliteserien", logo: "https://r2.thesportsdb.com/images/media/team/badge/9se6qv1690695269.png"},
   {name: "HamKam", league: "Norway Eliteserien", logo: ""},
   {name: "KFUM", league: "Norway Eliteserien", logo: ""},
-  {name: "Kristiansund", league: "Norway Eliteserien", logo: ""},
+  {name: "Kristiansund", league: "Norway Eliteserien", logo: "https://r2.thesportsdb.com/images/media/team/badge/wzrjhc1690695847.png"},
   {name: "Lillestrom", league: "Norway Eliteserien", logo: ""},
-  {name: "Molde", league: "Norway Eliteserien", logo: ""},
-  {name: "Rosenborg", league: "Norway Eliteserien", logo: ""},
+  {name: "Molde", league: "Norway Eliteserien", logo: "https://r2.thesportsdb.com/images/media/team/badge/apziyg1534866527.png"},
+  {name: "Rosenborg", league: "Norway Eliteserien", logo: "https://r2.thesportsdb.com/images/media/team/badge/z483ps1764866361.png"},
   {name: "Sandefjord", league: "Norway Eliteserien", logo: ""},
   {name: "Sarpsborg", league: "Norway Eliteserien", logo: ""},
   {name: "Start", league: "Norway Eliteserien", logo: ""},
@@ -663,7 +663,7 @@ const allTeams = [
   {name: "Atletico Morelia", league: "Mexico Liga de Expansion", logo: ""},
   {name: "Cancun", league: "Mexico Liga de Expansion", logo: ""},
   {name: "Irapuato", league: "Mexico Liga de Expansion", logo: ""},
-  {name: "Jaiba Brava", league: "Mexico Liga de Expansion", logo: ""},
+  {name: "Jaiba Brava", league: "Mexico Liga de Expansion", logo: "https://r2.thesportsdb.com/images/media/team/badge/ibcdf31754019410.png"},
   {name: "Oaxaca", league: "Mexico Liga de Expansion", logo: ""},
   {name: "Sinaloa", league: "Mexico Liga de Expansion", logo: ""},
   {name: "Tapatio", league: "Mexico Liga de Expansion", logo: ""},
@@ -672,7 +672,196 @@ const allTeams = [
   {name: "UAT", league: "Mexico Liga de Expansion", logo: ""},
   {name: "U. de G.", league: "Mexico Liga de Expansion", logo: ""},
   {name: "Venados", league: "Mexico Liga de Expansion", logo: ""},
-  {name: "Zacatecas", league: "Mexico Liga de Expansion", logo: ""}
+  {name: "Zacatecas", league: "Mexico Liga de Expansion", logo: ""},
+
+  // Egyptian Premier League (21 teams)
+  {name: "Al Ahly", league: "Egypt Premier League", logo: "https://r2.thesportsdb.com/images/media/team/badge/x8753q1751421890.png"},
+  {name: "Ceramica Cleopatra", league: "Egypt Premier League", logo: "https://r2.thesportsdb.com/images/media/team/badge/xy4shs1751422167.png"},
+  {name: "ENPPI", league: "Egypt Premier League", logo: "https://www.thesportsdb.com/images/media/team/badge/m6p9ml1787512639.png"},
+  {name: "Ghazl El Mahalla", league: "Egypt Premier League", logo: ""},
+  {name: "El Gouna", league: "Egypt Premier League", logo: "https://r2.thesportsdb.com/images/media/team/badge/6vdj631589807310.png"},
+  {name: "Haras El Hodoud", league: "Egypt Premier League", logo: ""},
+  {name: "Ismaily", league: "Egypt Premier League", logo: ""},
+  {name: "Al Ittihad", league: "Egypt Premier League", logo: ""},
+  {name: "Kahraba Ismailia", league: "Egypt Premier League", logo: ""},
+  {name: "Al Masry", league: "Egypt Premier League", logo: "https://r2.thesportsdb.com/images/media/team/badge/3aw86h1589807260.png"},
+  {name: "Modern Sport", league: "Egypt Premier League", logo: ""},
+  {name: "Al Mokawloon Al Arab", league: "Egypt Premier League", logo: "https://r2.thesportsdb.com/images/media/team/badge/gi170k1589807275.png"},
+  {name: "National Bank of Egypt", league: "Egypt Premier League", logo: ""},
+  {name: "Petrojet", league: "Egypt Premier League", logo: ""},
+  {name: "Pharco", league: "Egypt Premier League", logo: ""},
+  {name: "Pyramids", league: "Egypt Premier League", logo: ""},
+  {name: "Smouha", league: "Egypt Premier League", logo: ""},
+  {name: "Tala'ea El Gaish", league: "Egypt Premier League", logo: ""},
+  {name: "Wadi Degla", league: "Egypt Premier League", logo: ""},
+  {name: "Zamalek", league: "Egypt Premier League", logo: ""},
+  {name: "ZED", league: "Egypt Premier League", logo: ""},
+
+  // South Africa Premiership (16 teams)
+  {name: "AmaZulu", league: "South Africa PSL", logo: "https://r2.thesportsdb.com/images/media/team/badge/xcb9e71784744424.png"},
+  {name: "Chippa United", league: "South Africa PSL", logo: "https://r2.thesportsdb.com/images/media/team/badge/lzt11b1583614111.png"},
+  {name: "Durban City", league: "South Africa PSL", logo: "https://r2.thesportsdb.com/images/media/team/badge/y6gzkf1754524958.png"},
+  {name: "Kaizer Chiefs", league: "South Africa PSL", logo: "https://r2.thesportsdb.com/images/media/team/badge/akwtlr1583614121.png"},
+  {name: "Lamontville Golden Arrows", league: "South Africa PSL", logo: ""},
+  {name: "Magesi", league: "South Africa PSL", logo: ""},
+  {name: "Mamelodi Sundowns", league: "South Africa PSL", logo: "https://r2.thesportsdb.com/images/media/team/badge/u3md311784744590.png"},
+  {name: "Marumo Gallants", league: "South Africa PSL", logo: "https://r2.thesportsdb.com/images/media/team/badge/u9lft31741035570.png"},
+  {name: "Orbit College", league: "South Africa PSL", logo: ""},
+  {name: "Orlando Pirates", league: "South Africa PSL", logo: "https://r2.thesportsdb.com/images/media/team/badge/y6dbv61583616330.png"},
+  {name: "Polokwane City", league: "South Africa PSL", logo: ""},
+  {name: "Richards Bay", league: "South Africa PSL", logo: ""},
+  {name: "Sekhukhune United", league: "South Africa PSL", logo: ""},
+  {name: "Siwelele", league: "South Africa PSL", logo: ""},
+  {name: "Stellenbosch", league: "South Africa PSL", logo: ""},
+  {name: "TS Galaxy", league: "South Africa PSL", logo: ""},
+
+  // Morocco Botola Pro (16 teams)
+  {name: "US Yacoub El Mansour", league: "Morocco Botola", logo: ""},
+  {name: "COD Meknes", league: "Morocco Botola", logo: ""},
+  {name: "DH El-Jadida", league: "Morocco Botola", logo: ""},
+  {name: "AS FAR", league: "Morocco Botola", logo: ""},
+  {name: "FUS Rabat", league: "Morocco Botola", logo: "https://r2.thesportsdb.com/images/media/team/badge/vxk3aj1551518378.png"},
+  {name: "HUS Agadir", league: "Morocco Botola", logo: ""},
+  {name: "IR Tangier", league: "Morocco Botola", logo: ""},
+  {name: "MAS", league: "Morocco Botola", logo: ""},
+  {name: "Olympique Dcheira", league: "Morocco Botola", logo: "https://r2.thesportsdb.com/images/media/team/badge/o4v33g1727196921.png"},
+  {name: "OC Safi", league: "Morocco Botola", logo: ""},
+  {name: "Raja CA", league: "Morocco Botola", logo: ""},
+  {name: "RCA Zemamra", league: "Morocco Botola", logo: ""},
+  {name: "RS Berkane", league: "Morocco Botola", logo: ""},
+  {name: "KAC Marrakech", league: "Morocco Botola", logo: ""},
+  {name: "UTS Rabat", league: "Morocco Botola", logo: ""},
+  {name: "Wydad AC", league: "Morocco Botola", logo: ""},
+
+  // USA USL Championship (25 teams)
+  {name: "Birmingham Legion FC", league: "USA USL Championship", logo: "https://r2.thesportsdb.com/images/media/team/badge/8uw1mc1629299635.png"},
+  {name: "Brooklyn FC", league: "USA USL Championship", logo: "https://r2.thesportsdb.com/images/media/team/badge/p4tzze1765559400.png"},
+  {name: "Charleston Battery", league: "USA USL Championship", logo: "https://r2.thesportsdb.com/images/media/team/badge/uqx34i1690266678.png"},
+  {name: "Colorado Springs Switchbacks FC", league: "USA USL Championship", logo: "https://r2.thesportsdb.com/images/media/team/badge/oql6wu1629304849.png"},
+  {name: "Detroit City FC", league: "USA USL Championship", logo: "https://r2.thesportsdb.com/images/media/team/badge/aw7ceo1688514082.png"},
+  {name: "El Paso Locomotive FC", league: "USA USL Championship", logo: "https://r2.thesportsdb.com/images/media/team/badge/gsjebh1688514517.png"},
+  {name: "FC Tulsa", league: "USA USL Championship", logo: "https://r2.thesportsdb.com/images/media/team/badge/nyfdw21580480972.png"},
+  {name: "Hartford Athletic", league: "USA USL Championship", logo: "https://r2.thesportsdb.com/images/media/team/badge/dhbu3l1690266780.png"},
+  {name: "Indy Eleven", league: "USA USL Championship", logo: "https://r2.thesportsdb.com/images/media/team/badge/rxtrtp1431625996.png"},
+  {name: "Las Vegas Lights FC", league: "USA USL Championship", logo: "https://r2.thesportsdb.com/images/media/team/badge/wr69xv1629387151.png"},
+  {name: "Lexington SC", league: "USA USL Championship", logo: ""},
+  {name: "Loudoun United FC", league: "USA USL Championship", logo: ""},
+  {name: "Louisville City FC", league: "USA USL Championship", logo: ""},
+  {name: "Miami FC", league: "USA USL Championship", logo: ""},
+  {name: "Monterey Bay FC", league: "USA USL Championship", logo: ""},
+  {name: "New Mexico United", league: "USA USL Championship", logo: ""},
+  {name: "Oakland Roots SC", league: "USA USL Championship", logo: ""},
+  {name: "Orange County SC", league: "USA USL Championship", logo: ""},
+  {name: "Phoenix Rising FC", league: "USA USL Championship", logo: ""},
+  {name: "Pittsburgh Riverhounds SC", league: "USA USL Championship", logo: ""},
+  {name: "Rhode Island FC", league: "USA USL Championship", logo: ""},
+  {name: "Sacramento Republic FC", league: "USA USL Championship", logo: ""},
+  {name: "San Antonio FC", league: "USA USL Championship", logo: ""},
+  {name: "Sporting Club Jacksonville", league: "USA USL Championship", logo: ""},
+  {name: "Tampa Bay Rowdies", league: "USA USL Championship", logo: ""},
+
+  // Japan J2 League (20 teams)
+  {name: "Albirex Niigata", league: "Japan J2 League", logo: "https://r2.thesportsdb.com/images/media/team/badge/l16fvz1590070788.png"},
+  {name: "Blaublitz Akita", league: "Japan J2 League", logo: "https://r2.thesportsdb.com/images/media/team/badge/mi64031706246538.png"},
+  {name: "FC Imabari", league: "Japan J2 League", logo: "https://r2.thesportsdb.com/images/media/team/badge/s3f0u11617289673.png"},
+  {name: "Fujieda MYFC", league: "Japan J2 League", logo: "https://r2.thesportsdb.com/images/media/team/badge/4vjy3y1617289642.png"},
+  {name: "Hokkaido Consadole Sapporo", league: "Japan J2 League", logo: "https://r2.thesportsdb.com/images/media/team/badge/it2q671578253723.png"},
+  {name: "Iwaki FC", league: "Japan J2 League", logo: "https://r2.thesportsdb.com/images/media/team/badge/w3igvh1638823138.png"},
+  {name: "Jubilo Iwata", league: "Japan J2 League", logo: ""},
+  {name: "Kataller Toyama", league: "Japan J2 League", logo: "https://r2.thesportsdb.com/images/media/team/badge/wri77d1617289688.png"},
+  {name: "Montedio Yamagata", league: "Japan J2 League", logo: "https://r2.thesportsdb.com/images/media/team/badge/e9nykx1639487487.png"},
+  {name: "Oita Trinita", league: "Japan J2 League", logo: "https://r2.thesportsdb.com/images/media/team/badge/kwyqsd1578239318.png"},
+  {name: "RB Omiya Ardija", league: "Japan J2 League", logo: ""},
+  {name: "Sagan Tosu", league: "Japan J2 League", logo: ""},
+  {name: "Shonan Bellmare", league: "Japan J2 League", logo: ""},
+  {name: "Tegevajaro Miyazaki", league: "Japan J2 League", logo: ""},
+  {name: "Tochigi City", league: "Japan J2 League", logo: ""},
+  {name: "Tokushima Vortis", league: "Japan J2 League", logo: ""},
+  {name: "Vanraure Hachinohe", league: "Japan J2 League", logo: ""},
+  {name: "Vegalta Sendai", league: "Japan J2 League", logo: ""},
+  {name: "Ventforet Kofu", league: "Japan J2 League", logo: ""},
+  {name: "Yokohama FC", league: "Japan J2 League", logo: ""},
+
+  // South Korea K League 2 (17 teams)
+  {name: "Ansan Greeners", league: "South Korea K League 2", logo: "https://r2.thesportsdb.com/images/media/team/badge/gexjp81589557325.png"},
+  {name: "Busan IPark", league: "South Korea K League 2", logo: "https://r2.thesportsdb.com/images/media/team/badge/rc0vie1579473061.png"},
+  {name: "Cheonan City", league: "South Korea K League 2", logo: "https://r2.thesportsdb.com/images/media/team/badge/k53cdm1675284630.png"},
+  {name: "Chungbuk Cheongju", league: "South Korea K League 2", logo: "https://r2.thesportsdb.com/images/media/team/badge/mfbqxb1675284633.png"},
+  {name: "Chungnam Asan", league: "South Korea K League 2", logo: "https://r2.thesportsdb.com/images/media/team/badge/1tyyd81589558128.png"},
+  {name: "Daegu FC", league: "South Korea K League 2", logo: "https://r2.thesportsdb.com/images/media/team/badge/xzjzn11579473073.png"},
+  {name: "Gimhae FC", league: "South Korea K League 2", logo: "https://r2.thesportsdb.com/images/media/team/badge/hhi8821771815980.png"},
+  {name: "Gimpo FC", league: "South Korea K League 2", logo: "https://r2.thesportsdb.com/images/media/team/badge/wz3j6u1643554653.png"},
+  {name: "Gyeongnam FC", league: "South Korea K League 2", logo: "https://r2.thesportsdb.com/images/media/team/badge/nzy70n1581348710.png"},
+  {name: "Hwaseong FC", league: "South Korea K League 2", logo: "https://r2.thesportsdb.com/images/media/team/badge/fej1mc1736208077.png"},
+  {name: "Jeonnam Dragons", league: "South Korea K League 2", logo: ""},
+  {name: "Paju Frontier", league: "South Korea K League 2", logo: ""},
+  {name: "Seongnam FC", league: "South Korea K League 2", logo: ""},
+  {name: "Seoul E-Land", league: "South Korea K League 2", logo: ""},
+  {name: "Suwon FC", league: "South Korea K League 2", logo: ""},
+  {name: "Suwon Samsung Bluewings", league: "South Korea K League 2", logo: ""},
+  {name: "Yongin FC", league: "South Korea K League 2", logo: ""},
+
+  // Australia A-League Men (12 teams)
+  {name: "Adelaide United", league: "Australia A-League", logo: "https://r2.thesportsdb.com/images/media/team/badge/wpyuwv1473454602.png"},
+  {name: "Auckland FC", league: "Australia A-League", logo: "https://r2.thesportsdb.com/images/media/team/badge/f36lst1730017502.png"},
+  {name: "Brisbane Roar", league: "Australia A-League", logo: "https://r2.thesportsdb.com/images/media/team/badge/sypxsu1473454634.png"},
+  {name: "Central Coast Mariners", league: "Australia A-League", logo: "https://r2.thesportsdb.com/images/media/team/badge/ncdx4p1759642161.png"},
+  {name: "Macarthur FC", league: "Australia A-League", logo: "https://r2.thesportsdb.com/images/media/team/badge/9gr66g1579348350.png"},
+  {name: "Melbourne City", league: "Australia A-League", logo: "https://r2.thesportsdb.com/images/media/team/badge/rkeqme1603301840.png"},
+  {name: "Melbourne Victory", league: "Australia A-League", logo: "https://r2.thesportsdb.com/images/media/team/badge/wwvsqx1473454564.png"},
+  {name: "Newcastle Jets", league: "Australia A-League", logo: "https://r2.thesportsdb.com/images/media/team/badge/5jevk91653487832.png"},
+  {name: "Perth Glory", league: "Australia A-League", logo: "https://r2.thesportsdb.com/images/media/team/badge/2c9k5p1679114095.png"},
+  {name: "Sydney FC", league: "Australia A-League", logo: "https://r2.thesportsdb.com/images/media/team/badge/utgq8z1546110747.png"},
+  {name: "Wellington Phoenix", league: "Australia A-League", logo: ""},
+  {name: "Western Sydney Wanderers", league: "Australia A-League", logo: ""},
+
+  // UAE Pro League (14 teams)
+  {name: "Ajman", league: "UAE Pro League", logo: "https://r2.thesportsdb.com/images/media/team/badge/zohyna1677576452.png"},
+  {name: "Al Ain", league: "UAE Pro League", logo: "https://r2.thesportsdb.com/images/media/team/badge/0w2bk51747334688.png"},
+  {name: "Al Bataeh", league: "UAE Pro League", logo: ""},
+  {name: "Al Dhafra", league: "UAE Pro League", logo: "https://r2.thesportsdb.com/images/media/team/badge/613mvk1753982733.png"},
+  {name: "Al Jazira", league: "UAE Pro League", logo: "https://r2.thesportsdb.com/images/media/team/badge/uknsoq1642708421.png"},
+  {name: "Al Nasr", league: "UAE Pro League", logo: "https://r2.thesportsdb.com/images/media/team/badge/oy1zwv1753982526.png"},
+  {name: "Al Wahda", league: "UAE Pro League", logo: "https://r2.thesportsdb.com/images/media/team/badge/99xc7w1578858847.png"},
+  {name: "Al Wasl", league: "UAE Pro League", logo: "https://r2.thesportsdb.com/images/media/team/badge/s3o3ew1578859398.png"},
+  {name: "Baniyas", league: "UAE Pro League", logo: "https://r2.thesportsdb.com/images/media/team/badge/ps3a4d1578859691.png"},
+  {name: "Dibba", league: "UAE Pro League", logo: ""},
+  {name: "Kalba", league: "UAE Pro League", logo: ""},
+  {name: "Khor Fakkan", league: "UAE Pro League", logo: ""},
+  {name: "Shabab Al Ahli", league: "UAE Pro League", logo: ""},
+  {name: "Sharjah", league: "UAE Pro League", logo: ""},
+
+  // MLS Next Pro (30 teams)
+  {name: "Atlanta United 2", league: "MLS Next Pro", logo: "https://r2.thesportsdb.com/images/media/team/badge/6751ru1629299588.png"},
+  {name: "Austin FC II", league: "MLS Next Pro", logo: "https://r2.thesportsdb.com/images/media/team/badge/9y5mkc1679308384.png"},
+  {name: "Carolina Core FC", league: "MLS Next Pro", logo: "https://r2.thesportsdb.com/images/media/team/badge/3dgiwx1707991293.png"},
+  {name: "Chattanooga FC", league: "MLS Next Pro", logo: "https://r2.thesportsdb.com/images/media/team/badge/d30qj01629233922.png"},
+  {name: "Chicago Fire FC II", league: "MLS Next Pro", logo: "https://r2.thesportsdb.com/images/media/team/badge/ughimp1708353226.png"},
+  {name: "FC Cincinnati 2", league: "MLS Next Pro", logo: "https://r2.thesportsdb.com/images/media/team/badge/lwbgar1648907178.png"},
+  {name: "Colorado Rapids 2", league: "MLS Next Pro", logo: "https://r2.thesportsdb.com/images/media/team/badge/6ualhm1648907159.png"},
+  {name: "Columbus Crew 2", league: "MLS Next Pro", logo: "https://r2.thesportsdb.com/images/media/team/badge/2wm0d91648907172.png"},
+  {name: "Crown Legacy FC", league: "MLS Next Pro", logo: "https://r2.thesportsdb.com/images/media/team/badge/ft599y1679308389.png"},
+  {name: "CT United FC", league: "MLS Next Pro", logo: ""},
+  {name: "Houston Dynamo 2", league: "MLS Next Pro", logo: ""},
+  {name: "Huntsville City FC", league: "MLS Next Pro", logo: ""},
+  {name: "Inter Miami CF II", league: "MLS Next Pro", logo: ""},
+  {name: "Los Angeles FC 2", league: "MLS Next Pro", logo: ""},
+  {name: "Minnesota United FC 2", league: "MLS Next Pro", logo: ""},
+  {name: "New England Revolution II", league: "MLS Next Pro", logo: ""},
+  {name: "New York City FC II", league: "MLS Next Pro", logo: ""},
+  {name: "New York Red Bulls II", league: "MLS Next Pro", logo: ""},
+  {name: "North Texas SC", league: "MLS Next Pro", logo: ""},
+  {name: "Orlando City B", league: "MLS Next Pro", logo: ""},
+  {name: "Philadelphia Union II", league: "MLS Next Pro", logo: ""},
+  {name: "Portland Timbers 2", league: "MLS Next Pro", logo: ""},
+  {name: "Real Monarchs", league: "MLS Next Pro", logo: ""},
+  {name: "San Jose Earthquakes II", league: "MLS Next Pro", logo: ""},
+  {name: "Sporting Kansas City II", league: "MLS Next Pro", logo: ""},
+  {name: "St. Louis City 2", league: "MLS Next Pro", logo: ""},
+  {name: "Tacoma Defiance", league: "MLS Next Pro", logo: ""},
+  {name: "Toronto FC II", league: "MLS Next Pro", logo: ""},
+  {name: "Ventura County FC", league: "MLS Next Pro", logo: ""},
+  {name: "Whitecaps FC 2", league: "MLS Next Pro", logo: ""}
 ];
 
 // Real, verified league badges pulled directly from TheSportsDB's own
@@ -739,6 +928,14 @@ function onBadgeError(imgEl, name) {
 const matchesDiv = document.getElementById("matches");
 let activeLeague = "All";
 let searchTerm = "";
+
+function skeletonRows(count) {
+  return `<div>${Array.from({ length: count }, () => `<div class="skeleton-row"></div>`).join("")}</div>`;
+}
+
+function skeletonBlock() {
+  return `<div class="skeleton-block"></div><div class="skeleton-block" style="width:70%"></div><div class="skeleton-block" style="width:40%"></div>`;
+}
 
 // --- Favorites: real localStorage persistence, keyed by match ID. Starring
 // a match highlights it and pins it into a dedicated section at the very
@@ -824,7 +1021,16 @@ const LEAGUE_IDS = {
   "Denmark Superliga": 4340,
   "Sweden Allsvenskan": 4347,
   "Norway Eliteserien": 4358,
-  "Mexico Liga de Expansion": 4654
+  "Mexico Liga de Expansion": 4654,
+  "Egypt Premier League": 4829,
+  "South Africa PSL": 4802,
+  "Morocco Botola": 4520,
+  "USA USL Championship": 4684,
+  "Japan J2 League": 4824,
+  "South Korea K League 2": 4822,
+  "Australia A-League": 4356,
+  "UAE Pro League": 4678,
+  "MLS Next Pro": 5279
 };
 
 function badgeImg(logo, name, cssClass) {
@@ -910,7 +1116,16 @@ const LEAGUE_COUNTRY = {
   "Denmark Superliga": "Denmark",
   "Sweden Allsvenskan": "Sweden",
   "Norway Eliteserien": "Norway",
-  "Mexico Liga de Expansion": "Mexico"
+  "Mexico Liga de Expansion": "Mexico",
+  "Egypt Premier League": "Egypt",
+  "South Africa PSL": "South Africa",
+  "Morocco Botola": "Morocco",
+  "USA USL Championship": "USA",
+  "Japan J2 League": "Japan",
+  "South Korea K League 2": "South Korea",
+  "Australia A-League": "Australia",
+  "UAE Pro League": "UAE",
+  "MLS Next Pro": "USA"
 };
 
 // --- Fixtures for the currently-selected DAY, fetched live from the API,
@@ -1019,8 +1234,8 @@ async function fetchFixturesForWindow(centerDate) {
 
 async function loadFixturesAndRender() {
   fixturesLoading = true;
-  matchesDiv.innerHTML = `<div class="no-results">Loading real fixtures…</div>`;
-  document.getElementById("featured").innerHTML = `<div class="team-no-fixture">Loading…</div>`;
+  matchesDiv.innerHTML = skeletonRows(6);
+  document.getElementById("featured").innerHTML = skeletonBlock();
   document.querySelector(".date-label").textContent = dateBarLabel(currentDate);
   document.getElementById("calendarDayNum").textContent = currentDate.getDate();
   document.getElementById("datePickerInput").value = dateKey(currentDate);
@@ -1170,26 +1385,66 @@ function filterLeague(league, el) {
   else loadMatches();
 }
 
-// --- All Matches / All Teams toggle. "All Teams" browses the full roster
-// (every team we know about, regardless of whether it has a fixture in the
-// currently-loaded date) rather than derailing into the day's fixture data.
+// --- All Matches / All Teams / Favorites toggle. "All Teams" browses the
+// full roster (every team we know about, regardless of whether it has a
+// fixture in the currently-loaded date) rather than derailing into the
+// day's fixture data. "Favorites" is the same team-card view, just
+// pre-filtered to a separate starred list persisted in localStorage.
 let viewMode = "matches";
+
+const FAVORITE_TEAMS_KEY = "goalhub_favorite_teams";
+
+function getFavoriteTeamNames() {
+  try {
+    return new Set(JSON.parse(localStorage.getItem(FAVORITE_TEAMS_KEY) || "[]"));
+  } catch (err) {
+    return new Set();
+  }
+}
+
+function isTeamFavorited(name) {
+  return getFavoriteTeamNames().has(name);
+}
+
+function toggleFavoriteTeam(name) {
+  const favs = getFavoriteTeamNames();
+  if (favs.has(name)) favs.delete(name);
+  else favs.add(name);
+  localStorage.setItem(FAVORITE_TEAMS_KEY, JSON.stringify([...favs]));
+  if (viewMode === "teams" || viewMode === "favorites") renderAllTeams();
+}
 
 function setViewMode(mode) {
   viewMode = mode;
   document.getElementById("viewMatchesBtn").classList.toggle("active", mode === "matches");
   document.getElementById("viewTeamsBtn").classList.toggle("active", mode === "teams");
-  if (mode === "teams") renderAllTeams();
+  document.getElementById("viewFavoritesBtn").classList.toggle("active", mode === "favorites");
+  if (mode === "teams" || mode === "favorites") renderAllTeams();
   else loadMatches();
+}
+
+function renderTeamCard(t) {
+  const favorited = isTeamFavorited(t.name);
+  return `
+    <div class="team-list-row" onclick="openTeamModal('', '${t.name.replace(/'/g, "")}', '${t.logo}', '${t.league.replace(/'/g, "")}')">
+      ${badgeImg(t.logo, t.name, "")}<span>${t.name}</span>
+      <span class="fav-star team-fav-star${favorited ? " favorited" : ""}" onclick="event.stopPropagation(); toggleFavoriteTeam('${t.name.replace(/'/g, "")}')">${favorited ? "★" : "☆"}</span>
+    </div>`;
 }
 
 function renderAllTeams() {
   const term = searchTerm.trim().toLowerCase();
-  let teams = activeLeague === "All" ? allTeams : allTeams.filter(t => t.league === activeLeague);
-  if (term) teams = teams.filter(t => t.name.toLowerCase().includes(term));
+  const favoritesOnly = viewMode === "favorites";
+
+  let teams = favoritesOnly ? allTeams.filter(t => isTeamFavorited(t.name)) : allTeams;
+  if (!favoritesOnly && activeLeague !== "All") teams = teams.filter(t => t.league === activeLeague);
+  if (term) teams = teams.filter(t => t.name.toLowerCase().includes(term) || t.league.toLowerCase().includes(term));
 
   if (teams.length === 0) {
-    matchesDiv.innerHTML = `<div class="no-results">No teams match${term ? ` "${searchTerm}"` : ""}. Try another search or league.</div>`;
+    const emptyMsg = favoritesOnly
+      ? `No favorite teams yet. Star a team from the All Teams tab to save it here.`
+      : `No teams match${term ? ` "${searchTerm}"` : ""}. Try another search or league.`;
+    matchesDiv.innerHTML = `<div class="no-results">${emptyMsg}</div>`;
     return;
   }
 
@@ -1200,7 +1455,7 @@ function renderAllTeams() {
   const byLeague = {};
   teams.forEach(t => { (byLeague[t.league] = byLeague[t.league] || []).push(t); });
 
-  let html = `
+  let html = favoritesOnly ? "" : `
     <div class="team-view-controls">
       <select class="league-filter-select" onchange="filterLeague(this.value, null)">${leagueOptions}</select>
     </div>`;
@@ -1216,10 +1471,7 @@ function renderAllTeams() {
           </div>
         </div>
         <div class="team-grid">
-          ${byLeague[league].map(t => `
-            <div class="team-list-row" onclick="openTeamModal('', '${t.name.replace(/'/g, "")}', '${t.logo}', '${league.replace(/'/g, "")}')">
-              ${badgeImg(t.logo, t.name, "")}<span>${t.name}</span>
-            </div>`).join("")}
+          ${byLeague[league].map(renderTeamCard).join("")}
         </div>
       </div>`;
   });
@@ -1377,7 +1629,7 @@ async function showTeamTab(tab) {
     return;
   }
 
-  body.innerHTML = `<div class="team-no-fixture">Loading…</div>`;
+  body.innerHTML = skeletonRows(4);
 
   let html, failed = false;
   try {
@@ -1624,7 +1876,7 @@ function seasonStringForLeague(league, dateStr) {
   // Argentina leagues: "2026", Sweden/Norway top flights: "2026" — despite
   // MLS also running March-December, its own metadata reports "2026-2027",
   // so MLS uses the default Aug-cutoff format below).
-  const CALENDAR_YEAR_LEAGUES = ["Brasileirao", "Liga Profesional Argentina", "Brazil Serie B", "Argentina Primera Nacional", "Sweden Allsvenskan", "Norway Eliteserien"];
+  const CALENDAR_YEAR_LEAGUES = ["Brasileirao", "Liga Profesional Argentina", "Brazil Serie B", "Argentina Primera Nacional", "Sweden Allsvenskan", "Norway Eliteserien", "USA USL Championship", "South Korea K League 2", "MLS Next Pro"];
   if (CALENDAR_YEAR_LEAGUES.includes(league)) return String(d.getFullYear());
   const year = d.getMonth() >= 6 ? d.getFullYear() : d.getFullYear() - 1;
   return `${year}-${year + 1}`;
@@ -1939,7 +2191,7 @@ async function showMatchTab(tab) {
     return;
   }
 
-  body.innerHTML = `<div class="team-no-fixture">Loading…</div>`;
+  body.innerHTML = skeletonRows(4);
 
   let html, failed = false;
   try {
