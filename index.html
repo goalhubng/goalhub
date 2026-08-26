@@ -124,6 +124,7 @@
         <button id="viewMatchesBtn" class="view-toggle-btn active" onclick="setViewMode('matches')">All Matches</button>
         <button id="viewTeamsBtn" class="view-toggle-btn" onclick="setViewMode('teams')">All Teams</button>
         <button id="viewFavoritesBtn" class="view-toggle-btn" onclick="setViewMode('favorites')">★ Favorites</button>
+        <button id="viewLeaderboardBtn" class="view-toggle-btn" onclick="setViewMode('leaderboard')">🏆 Leaderboard</button>
       </div>
       <div id="matches"></div>
     </main>
@@ -152,6 +153,15 @@
     <div class="team-modal-card glass match-modal-card">
       <button class="team-modal-close" onclick="closeMatchModal()" aria-label="Close">&times;</button>
       <div id="matchModalContent"></div>
+    </div>
+  </div>
+
+  <!-- LIVE NOW MATCH DETAIL MODAL (API-Football sourced) -->
+  <div class="team-modal" id="liveMatchModal">
+    <div class="team-modal-backdrop" onclick="closeLiveMatchModal()"></div>
+    <div class="team-modal-card glass match-modal-card">
+      <button class="team-modal-close" onclick="closeLiveMatchModal()" aria-label="Close">&times;</button>
+      <div id="liveMatchModalContent"></div>
     </div>
   </div>
 

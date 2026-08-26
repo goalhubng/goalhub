@@ -366,6 +366,128 @@ async function handleDeleteFavorite(request, env, favoriteId) {
   return jsonResponse({ ok: true });
 }
 
+// --- Score predictions game. Predictions reference GoalHub's main fixture
+// pipeline (TheSportsDB event ids — the browsable, date-navigable fixture
+// list), not the API-Football-sourced Live Now widget, since those ids
+// aren't stable enough to score against later.
+//
+// Resolution is lazy rather than cron-driven: whenever the leaderboard is
+// requested, any unresolved prediction whose kickoff has clearly passed
+// gets checked against the real final score (via TheSportsDB) and scored
+// then. No always-on scheduled infrastructure needed for this.
+const SPORTSDB_BASE_WORKER = "https://www.thesportsdb.com/api/v1/json/123";
+const PREDICTION_RESOLVE_BATCH = 20;
+// Give a match 3 hours from kickoff before assuming it's finished — long
+// enough to cover full time + stoppage + extra time for any competition.
+const MATCH_LIKELY_OVER_SECONDS = 3 * 60 * 60;
+
+async function handleSubmitPrediction(request, env) {
+  const user = await authenticate(request, env);
+  if (!user) return jsonResponse({ error: "unauthorized" }, 401);
+
+  let body;
+  try {
+    body = await request.json();
+  } catch (err) {
+    return jsonResponse({ error: "invalid JSON body" }, 400);
+  }
+  const fixtureId = String(body.fixture_id || "").trim();
+  const homeTeam = String(body.home_team || "").trim();
+  const awayTeam = String(body.away_team || "").trim();
+  const kickoffAt = Number(body.kickoff_at);
+  const predictedHome = Number(body.predicted_home);
+  const predictedAway = Number(body.predicted_away);
+
+  if (!fixtureId || !homeTeam || !awayTeam || !Number.isFinite(kickoffAt)) {
+    return jsonResponse({ error: "missing fixture details" }, 400);
+  }
+  if (!Number.isInteger(predictedHome) || !Number.isInteger(predictedAway) || predictedHome < 0 || predictedAway < 0 || predictedHome > 30 || predictedAway > 30) {
+    return jsonResponse({ error: "invalid predicted score" }, 400);
+  }
+
+  const now = Math.floor(Date.now() / 1000);
+  if (now >= kickoffAt) {
+    return jsonResponse({ error: "this match has already kicked off" }, 400);
+  }
+
+  await env.goalhub_db
+    .prepare(
+      `INSERT INTO predictions (user_id, fixture_id, home_team, away_team, kickoff_at, predicted_home, predicted_away, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+       ON CONFLICT(user_id, fixture_id) DO UPDATE SET
+         predicted_home = excluded.predicted_home, predicted_away = excluded.predicted_away,
+         points = NULL, resolved = 0`
+    )
+    .bind(user.id, fixtureId, homeTeam, awayTeam, kickoffAt, predictedHome, predictedAway, now)
+    .run();
+
+  return jsonResponse({ ok: true });
+}
+
+async function handleMyPredictions(request, env) {
+  const user = await authenticate(request, env);
+  if (!user) return jsonResponse({ error: "unauthorized" }, 401);
+  const { results } = await env.goalhub_db
+    .prepare("SELECT fixture_id, predicted_home, predicted_away, points, resolved FROM predictions WHERE user_id = ?")
+    .bind(user.id)
+    .all();
+  return jsonResponse({ predictions: results });
+}
+
+function pointsForPrediction(predHome, predAway, actualHome, actualAway) {
+  if (predHome === actualHome && predAway === actualAway) return 3;
+  const predResult = Math.sign(predHome - predAway);
+  const actualResult = Math.sign(actualHome - actualAway);
+  return predResult === actualResult ? 1 : 0;
+}
+
+async function resolveDuePredictions(env) {
+  const cutoff = Math.floor(Date.now() / 1000) - MATCH_LIKELY_OVER_SECONDS;
+  const { results: due } = await env.goalhub_db
+    .prepare("SELECT * FROM predictions WHERE resolved = 0 AND kickoff_at < ? LIMIT ?")
+    .bind(cutoff, PREDICTION_RESOLVE_BATCH)
+    .all();
+
+  for (const pred of due) {
+    try {
+      const res = await fetch(`${SPORTSDB_BASE_WORKER}/lookupevent.php?id=${pred.fixture_id}`);
+      if (!res.ok) continue; // shared free key can be rate-limited — retried on the next leaderboard request
+      const data = await res.json();
+      const event = (data.events || [])[0];
+      if (!event || event.intHomeScore === null || event.intAwayScore === null) continue; // not actually finished yet
+      const actualHome = Number(event.intHomeScore);
+      const actualAway = Number(event.intAwayScore);
+      const points = pointsForPrediction(pred.predicted_home, pred.predicted_away, actualHome, actualAway);
+      await env.goalhub_db
+        .prepare("UPDATE predictions SET points = ?, resolved = 1 WHERE id = ?")
+        .bind(points, pred.id)
+        .run();
+    } catch (err) {
+      console.error("resolveDuePredictions: fixture", pred.fixture_id, err.message);
+    }
+  }
+}
+
+async function handleLeaderboard(env) {
+  await resolveDuePredictions(env);
+
+  const weekAgo = Math.floor(Date.now() / 1000) - 7 * 24 * 60 * 60;
+  const { results } = await env.goalhub_db
+    .prepare(
+      `SELECT u.email as email, SUM(p.points) as total_points, COUNT(*) as predictions_made
+       FROM predictions p
+       JOIN users u ON u.id = p.user_id
+       WHERE p.resolved = 1 AND p.created_at >= ?
+       GROUP BY p.user_id
+       ORDER BY total_points DESC
+       LIMIT 20`
+    )
+    .bind(weekAgo)
+    .all();
+
+  return jsonResponse({ leaderboard: results });
+}
+
 // --- Per-match chat + score-prediction room. One DO instance per match ID
 // (via getByName), so each match gets its own isolated chat/prediction feed
 // that naturally clears relevance once the match is old — no cross-match
@@ -525,6 +647,17 @@ export default {
       }
     }
 
+    if (url.pathname === "/api/predictions/submit" || url.pathname === "/api/predictions/mine" || url.pathname === "/api/predictions/leaderboard") {
+      try {
+        if (url.pathname === "/api/predictions/submit" && request.method === "POST") return await handleSubmitPrediction(request, env);
+        if (url.pathname === "/api/predictions/mine" && request.method === "GET") return await handleMyPredictions(request, env);
+        if (url.pathname === "/api/predictions/leaderboard" && request.method === "GET") return await handleLeaderboard(env);
+        return jsonResponse({ error: "unknown endpoint" }, 404);
+      } catch (err) {
+        return jsonResponse({ error: "internal error" }, 500);
+      }
+    }
+
     const cache = caches.default;
     const cacheKey = new Request(request.url, request);
     const cached = await cache.match(cacheKey);
@@ -558,6 +691,7 @@ export default {
         const data = await apiFootballFetch(env, "/fixtures?live=all");
         const all = data.response || [];
         const trackedLeagueIds = new Set(Object.values(LEAGUE_IDS));
+        const leagueIdToGoalhubName = Object.fromEntries(Object.entries(LEAGUE_IDS).map(([name, id]) => [id, name]));
         const tracked = all.filter(f => trackedLeagueIds.has(f.league.id));
         const rest = all.filter(f => !trackedLeagueIds.has(f.league.id));
         const chosen = [...tracked, ...rest].slice(0, 6);
@@ -565,11 +699,47 @@ export default {
           fixtures: chosen.map(f => ({
             id: f.fixture.id,
             league: f.league.name,
+            leagueId: f.league.id,
+            goalhubLeagueName: leagueIdToGoalhubName[f.league.id] || null,
             leagueLogo: f.league.logo,
+            venue: f.fixture.venue && f.fixture.venue.name,
+            referee: f.fixture.referee,
             minute: f.fixture.status.elapsed,
             statusShort: f.fixture.status.short,
             home: { name: f.teams.home.name, logo: f.teams.home.logo, score: f.goals.home },
             away: { name: f.teams.away.name, logo: f.teams.away.logo, score: f.goals.away }
+          }))
+        };
+      } else if (url.pathname === "/fixture-details") {
+        // Match modal for a Live Now card: real events (goals/cards/subs
+        // with minutes), real team statistics (possession/shots/corners —
+        // NOT xG, which this free tier's schema has a slot for but never
+        // actually populates), and real full lineups with formation.
+        const fixtureId = url.searchParams.get("id");
+        if (!fixtureId) return jsonResponse({ error: "missing id" }, 400);
+        const [eventsData, statsData, lineupsData] = await Promise.all([
+          apiFootballFetch(env, `/fixtures/events?fixture=${fixtureId}`),
+          apiFootballFetch(env, `/fixtures/statistics?fixture=${fixtureId}`),
+          apiFootballFetch(env, `/fixtures/lineups?fixture=${fixtureId}`)
+        ]);
+        payload = {
+          events: (eventsData.response || []).map(e => ({
+            minute: e.time.elapsed,
+            extra: e.time.extra,
+            type: e.type,
+            detail: e.detail,
+            player: e.player && e.player.name,
+            assist: e.assist && e.assist.name,
+            team: e.team && e.team.name
+          })),
+          statistics: (statsData.response || []).map(t => ({
+            team: t.team.name,
+            stats: (t.statistics || []).filter(s => s.value !== null && !["expected_goals", "goals_prevented"].includes(s.type))
+          })),
+          lineups: (lineupsData.response || []).map(t => ({
+            team: t.team.name,
+            formation: t.formation,
+            startXI: (t.startXI || []).map(p => ({ name: p.player.name, pos: p.player.pos, number: p.player.number }))
           }))
         };
       } else if (url.pathname === "/team-search") {

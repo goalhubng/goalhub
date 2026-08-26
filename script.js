@@ -1072,6 +1072,7 @@ function logout() {
   clearAuthToken();
   currentUser = null;
   serverFavoritesByName = null;
+  myPredictionsByFixture = null;
   renderAuthArea();
   closeAuthModal();
   // Server-side favorites are per-account — drop back to whatever's in
@@ -1154,7 +1155,7 @@ async function initAuth() {
   currentUser = fromCallback || await getCurrentUser();
   renderAuthArea();
   if (currentUser) {
-    await fetchServerFavorites();
+    await Promise.all([fetchServerFavorites(), fetchMyPredictions()]);
     if (viewMode === "favorites" || viewMode === "teams") renderAllTeams();
     else if (viewMode === "matches") loadMatches();
   }
@@ -1445,6 +1446,7 @@ async function loadFixturesAndRender() {
 // for today, never mock data. An honest empty state when nothing's live
 // right now, rather than padding the grid with anything fake.
 const AF_IN_PROGRESS_STATUSES = new Set(["1H", "2H", "HT", "ET", "BT", "P", "LIVE"]);
+let liveFixturesById = {};
 
 function afMinuteLabel(f) {
   if (f.statusShort === "HT") return "HT";
@@ -1476,8 +1478,10 @@ async function renderLiveNowSection() {
     return;
   }
 
+  liveFixturesById = Object.fromEntries(live.map(f => [f.id, f]));
+
   grid.innerHTML = live.map(f => `
-    <div class="live-game-card hover-glow" data-af-id="${f.id}">
+    <div class="live-game-card hover-glow" onclick="openLiveMatchModal('${f.id}')">
       <div class="live-game-league">${badgeImg(f.leagueLogo, f.league, "")}<span>${f.league}</span><span class="live-badge">LIVE</span></div>
       <div class="live-game-row">
         <div class="live-game-team">${badgeImg(f.home.logo, f.home.name, "")}<span>${f.home.name}</span></div>
@@ -1489,6 +1493,143 @@ async function renderLiveNowSection() {
       </div>
       <div class="live-game-minute">${afMinuteLabel(f)}</div>
     </div>`).join("");
+}
+
+// --- Live Now match detail modal. Separate from the main match modal
+// because these fixtures come from API-Football (Live Now widget), not
+// TheSportsDB (GoalHub's main fixture pipeline) — different id namespace,
+// different data shape. Timeline/Stats/Lineups are real, verified data;
+// Table only shows when the match is in one of GoalHub's tracked leagues
+// (most Live Now matches are from smaller competitions we don't track
+// standings for, and that's shown honestly rather than guessed at).
+let currentLiveFixture = null;
+const liveFixtureDetailsCache = {};
+
+function openLiveMatchModal(fixtureId) {
+  const f = liveFixturesById[fixtureId];
+  if (!f) return;
+  currentLiveFixture = f;
+
+  document.getElementById("liveMatchModalContent").innerHTML = `
+    <div class="match-modal-league">${badgeImg(f.leagueLogo, f.league, "")}<span>${f.league}</span></div>
+    <div class="match-modal-teams">
+      <div class="match-modal-team">${badgeImg(f.home.logo, f.home.name, "")}<span>${f.home.name}</span></div>
+      <div class="match-modal-center">
+        <div class="match-modal-time">${f.home.score ?? 0} - ${f.away.score ?? 0}</div>
+        <div class="match-modal-sub">${afMinuteLabel(f)}</div>
+      </div>
+      <div class="match-modal-team">${badgeImg(f.away.logo, f.away.name, "")}<span>${f.away.name}</span></div>
+    </div>
+    <div class="match-modal-tabs">
+      <button class="match-tab-btn active" data-live-tab="timeline" onclick="showLiveMatchTab('timeline')">Timeline</button>
+      <button class="match-tab-btn" data-live-tab="stats" onclick="showLiveMatchTab('stats')">Stats</button>
+      <button class="match-tab-btn" data-live-tab="lineups" onclick="showLiveMatchTab('lineups')">Lineups</button>
+      <button class="match-tab-btn" data-live-tab="table" onclick="showLiveMatchTab('table')">Table</button>
+    </div>
+    <div class="match-modal-tab-body" id="liveMatchTabBody"></div>`;
+  document.getElementById("liveMatchModal").classList.add("open");
+  showLiveMatchTab("timeline");
+}
+
+function closeLiveMatchModal() {
+  document.getElementById("liveMatchModal").classList.remove("open");
+  currentLiveFixture = null;
+}
+
+async function fetchLiveFixtureDetails(fixtureId) {
+  if (liveFixtureDetailsCache[fixtureId]) return liveFixtureDetailsCache[fixtureId];
+  const res = await fetch(`${CHAT_WORKER_BASE}/fixture-details?id=${fixtureId}`);
+  if (!res.ok) throw new Error("bad response");
+  const data = await res.json();
+  liveFixtureDetailsCache[fixtureId] = data;
+  return data;
+}
+
+async function showLiveMatchTab(tab) {
+  const f = currentLiveFixture;
+  if (!f) return;
+  document.querySelectorAll("[data-live-tab]").forEach(b => b.classList.toggle("active", b.dataset.liveTab === tab));
+  const body = document.getElementById("liveMatchTabBody");
+  body.innerHTML = skeletonRows(3);
+
+  try {
+    if (tab === "table") {
+      const html = f.goalhubLeagueName
+        ? await fetchLeagueTableHtml(f.goalhubLeagueName, dateKey(new Date()), [f.home.name, f.away.name])
+        : `<div class="team-no-fixture">Standings aren't tracked for this competition (${f.league}) on GoalHub.</div>`;
+      if (currentLiveFixture === f) body.innerHTML = html;
+      return;
+    }
+
+    const details = await fetchLiveFixtureDetails(f.id);
+    if (currentLiveFixture !== f) return; // user closed/switched while this was in flight
+
+    if (tab === "timeline") body.innerHTML = renderLiveTimelineTab(details);
+    else if (tab === "stats") body.innerHTML = renderLiveStatsTab(details, f);
+    else if (tab === "lineups") body.innerHTML = renderLiveLineupsTab(details);
+  } catch (err) {
+    if (currentLiveFixture === f) {
+      body.innerHTML = `<div class="no-results">Couldn't load this right now (the free API can be flaky under load). <span class="retry-link" onclick="showLiveMatchTab('${tab}')">Tap to retry</span>.</div>`;
+    }
+  }
+}
+
+const EVENT_ICONS = { Goal: "⚽", Card: "🟨", subst: "🔁" };
+
+function renderLiveTimelineTab(details) {
+  const events = details.events || [];
+  if (events.length === 0) return `<div class="team-no-fixture">No timeline events yet.</div>`;
+  return `<div class="timeline-list">${events.map(e => `
+    <div class="timeline-row">
+      <span class="timeline-minute">${e.minute}${e.extra ? `+${e.extra}` : ""}'</span>
+      <span class="timeline-icon">${EVENT_ICONS[e.type] || "•"}</span>
+      <span class="timeline-detail"><strong>${e.player || e.detail}</strong> — ${e.detail}${e.assist ? ` (assist: ${e.assist})` : ""}<br><span class="timeline-team">${e.team || ""}</span></span>
+    </div>`).join("")}</div>`;
+}
+
+function renderLiveStatsTab(details, f) {
+  const stats = details.statistics || [];
+  if (stats.length < 2) return `<div class="team-no-fixture">Stats aren't published for this match yet.</div>`;
+  const [home, away] = stats;
+  const byType = {};
+  home.stats.forEach(s => { byType[s.type] = byType[s.type] || {}; byType[s.type].home = s.value; });
+  away.stats.forEach(s => { byType[s.type] = byType[s.type] || {}; byType[s.type].away = s.value; });
+
+  const rows = Object.entries(byType).map(([type, v]) => {
+    const homeNum = parseFloat(v.home) || 0;
+    const awayNum = parseFloat(v.away) || 0;
+    const total = homeNum + awayNum || 1;
+    const homePct = Math.round((homeNum / total) * 100);
+    return `
+      <div class="stat-row">
+        <div class="stat-values">
+          <span class="stat-value">${v.home ?? "—"}</span>
+          <span class="stat-label">${type}</span>
+          <span class="stat-value">${v.away ?? "—"}</span>
+        </div>
+        <div class="stat-bar-track">
+          <div class="stat-bar-home" style="width:${homePct}%"></div>
+          <div class="stat-bar-away" style="width:${100 - homePct}%"></div>
+        </div>
+      </div>`;
+  }).join("");
+  return `<div class="stats-list">${rows}</div>`;
+}
+
+function renderLiveLineupsTab(details) {
+  const lineups = details.lineups || [];
+  if (lineups.length < 2) return `<div class="team-no-fixture">Lineups aren't published for this match yet.</div>`;
+  const renderSide = t => `
+    <div class="lineup-side">
+      <div class="lineup-side-title">${t.team}${t.formation ? ` · ${t.formation}` : ""}</div>
+      ${t.startXI.map(p => `
+        <div class="lineup-player">
+          <span class="lineup-number">${p.number ?? ""}</span>
+          <span class="lineup-name">${p.name}</span>
+          <span class="lineup-position">${p.pos || ""}</span>
+        </div>`).join("")}
+    </div>`;
+  return `<div class="lineup-grid">${lineups.map(renderSide).join("")}</div>`;
 }
 
 // --- Top Leagues strip — a curated set of leagues we actually have real
@@ -1711,6 +1852,81 @@ function isTeamFavorited(name) {
   return getLocalFavoriteTeamNames().has(name);
 }
 
+// --- Score predictions. fixture_id -> {predicted_home, predicted_away,
+// points, resolved}, fetched once per session (same pattern as favorites).
+let myPredictionsByFixture = null;
+
+async function fetchMyPredictions() {
+  if (!currentUser) { myPredictionsByFixture = null; return; }
+  const token = getAuthToken();
+  const res = await fetch(`${CHAT_WORKER_BASE}/api/predictions/mine`, { headers: { Authorization: `Bearer ${token}` } });
+  if (!res.ok) { myPredictionsByFixture = new Map(); return; }
+  const data = await res.json();
+  myPredictionsByFixture = new Map(data.predictions.map(p => [p.fixture_id, p]));
+}
+
+function renderPredictTab(fixture) {
+  const body = document.getElementById("matchTabBody");
+
+  if (!currentUser) {
+    body.innerHTML = `<div class="team-no-fixture">Log in to predict this match's score.</div>`;
+    return;
+  }
+
+  const existing = myPredictionsByFixture && myPredictionsByFixture.get(String(fixture.id));
+  if (existing) {
+    body.innerHTML = `
+      <div class="predict-result">
+        <div class="predict-result-label">You predicted</div>
+        <div class="predict-result-score">${fixture.home.name} ${existing.predicted_home} - ${existing.predicted_away} ${fixture.away.name}</div>
+        ${existing.resolved
+          ? `<div class="predict-result-points">${existing.points} point${existing.points === 1 ? "" : "s"} awarded</div>`
+          : `<div class="predict-result-pending">Points awarded once the match finishes</div>`}
+      </div>`;
+    return;
+  }
+
+  body.innerHTML = `
+    <div class="predict-form">
+      <div class="predict-form-teams">
+        <span>${fixture.home.name}</span>
+        <input type="number" id="predictHomeScore" class="predict-score-input" min="0" max="30" value="0">
+        <span class="predict-vs">-</span>
+        <input type="number" id="predictAwayScore" class="predict-score-input" min="0" max="30" value="0">
+        <span>${fixture.away.name}</span>
+      </div>
+      <button class="auth-submit-btn" onclick="submitScorePrediction('${fixture.id}')">Submit Prediction</button>
+      <div id="predictStatusMsg" class="auth-status-msg"></div>
+    </div>`;
+}
+
+async function submitScorePrediction(fixtureId) {
+  const fixture = currentMatchFixture;
+  if (!fixture || String(fixture.id) !== String(fixtureId)) return;
+  const predictedHome = Number(document.getElementById("predictHomeScore").value);
+  const predictedAway = Number(document.getElementById("predictAwayScore").value);
+  const kickoffAt = Math.floor(new Date(`${fixture.date}T${fixture.time || "00:00"}:00`).getTime() / 1000);
+  const status = document.getElementById("predictStatusMsg");
+
+  try {
+    const res = await fetch(`${CHAT_WORKER_BASE}/api/predictions/submit`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${getAuthToken()}` },
+      body: JSON.stringify({
+        fixture_id: fixtureId, home_team: fixture.home.name, away_team: fixture.away.name,
+        kickoff_at: kickoffAt, predicted_home: predictedHome, predicted_away: predictedAway
+      })
+    });
+    const data = await res.json();
+    if (!res.ok) { status.textContent = data.error || "Couldn't submit — try again."; return; }
+    if (!myPredictionsByFixture) myPredictionsByFixture = new Map();
+    myPredictionsByFixture.set(String(fixtureId), { predicted_home: predictedHome, predicted_away: predictedAway, points: null, resolved: 0 });
+    renderPredictTab(fixture);
+  } catch (err) {
+    status.textContent = "Couldn't reach the server — try again.";
+  }
+}
+
 async function toggleFavoriteTeam(name) {
   if (currentUser) {
     const token = getAuthToken();
@@ -1748,8 +1964,40 @@ function setViewMode(mode) {
   document.getElementById("viewMatchesBtn").classList.toggle("active", mode === "matches");
   document.getElementById("viewTeamsBtn").classList.toggle("active", mode === "teams");
   document.getElementById("viewFavoritesBtn").classList.toggle("active", mode === "favorites");
+  document.getElementById("viewLeaderboardBtn").classList.toggle("active", mode === "leaderboard");
   if (mode === "teams" || mode === "favorites") renderAllTeams();
+  else if (mode === "leaderboard") renderLeaderboard();
   else loadMatches();
+}
+
+async function renderLeaderboard() {
+  matchesDiv.innerHTML = skeletonRows(5);
+  let leaderboard;
+  try {
+    const res = await fetch(`${CHAT_WORKER_BASE}/api/predictions/leaderboard`);
+    if (!res.ok) throw new Error("bad response");
+    const data = await res.json();
+    leaderboard = data.leaderboard || [];
+  } catch (err) {
+    matchesDiv.innerHTML = `<div class="no-results">Couldn't load the leaderboard right now. <span class="retry-link" onclick="renderLeaderboard()">Tap to retry</span>.</div>`;
+    return;
+  }
+
+  if (leaderboard.length === 0) {
+    matchesDiv.innerHTML = `<div class="no-results">No scored predictions yet this week. Predict an upcoming match to get on the board.</div>`;
+    return;
+  }
+
+  matchesDiv.innerHTML = `
+    <div class="leaderboard-list">
+      ${leaderboard.map((row, i) => `
+        <div class="leaderboard-row${i < 3 ? " leaderboard-top3" : ""}">
+          <span class="leaderboard-rank">${i + 1}</span>
+          <span class="leaderboard-email">${row.email}</span>
+          <span class="leaderboard-preds">${row.predictions_made} pred${row.predictions_made === 1 ? "" : "s"}</span>
+          <span class="leaderboard-points">${row.total_points} pts</span>
+        </div>`).join("")}
+    </div>`;
 }
 
 function renderTeamCard(t) {
@@ -2233,6 +2481,7 @@ function openMatchModal(matchId) {
     </div>
     <div class="match-modal-tabs">
       <button class="match-tab-btn active" data-tab="info" onclick="showMatchTab('info')">Info</button>
+      ${fixture.status === "NS" || !fixture.status ? `<button class="match-tab-btn" data-tab="predict" onclick="showMatchTab('predict')">Predict</button>` : ""}
       <button class="match-tab-btn" data-tab="lineups" onclick="showMatchTab('lineups')">Line-ups</button>
       <button class="match-tab-btn" data-tab="table" onclick="showMatchTab('table')">Table</button>
       <button class="match-tab-btn" data-tab="stats" onclick="showMatchTab('stats')">Stats</button>
@@ -2510,6 +2759,10 @@ async function showMatchTab(tab) {
   }
   if (tab === "motm") {
     renderMotmTab(fixture);
+    return;
+  }
+  if (tab === "predict") {
+    renderPredictTab(fixture);
     return;
   }
   closeChatSocket(); // leaving chat/MOTM for a static tab — drop the connection
