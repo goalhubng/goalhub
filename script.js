@@ -920,6 +920,25 @@ function initialsAvatar(name) {
   return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
 }
 
+// A plain jersey silhouette reads more clearly as "no photo for this player"
+// than the colored-initials avatar used for team/league badges elsewhere.
+function jerseyIcon() {
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'>
+    <rect width='40' height='40' rx='8' fill='#1a2230'/>
+    <path d='M13 8 L8 13 L11 17 L13 15 L13 32 L27 32 L27 15 L29 17 L32 13 L27 8 L23 11 Q20 13 17 11 Z'
+      fill='none' stroke='#5b6b82' stroke-width='2' stroke-linejoin='round'/>
+  </svg>`;
+  return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
+}
+
+function playerPhotoImg(photo, name, cssClass) {
+  const src = photo || jerseyIcon();
+  // jerseyIcon()'s data URI has unescaped single quotes (encodeURIComponent
+  // doesn't touch them), so it can't be inlined as a '...'-quoted JS string
+  // literal here — call the function directly instead of embedding its value.
+  return `<img class="${cssClass}" src="${src}" alt="${name}" loading="lazy" onerror="this.onerror=null; this.src=jerseyIcon();">`;
+}
+
 function onBadgeError(imgEl, name) {
   imgEl.onerror = null;
   imgEl.src = initialsAvatar(name);
@@ -972,6 +991,174 @@ const SPORTSDB_BASE = `https://www.thesportsdb.com/api/v1/json/${SPORTSDB_KEY}`;
 // Our own Cloudflare Worker, hosting the per-match chat + prediction rooms
 // (see api-proxy/worker.js — the ChatRoom Durable Object).
 const CHAT_WORKER_BASE = "https://goalhub-api-proxy.betterdays-goalhub.workers.dev";
+
+// --- Auth: email magic-link login (see api-proxy/worker.js for the server
+// side). The JWT is the only thing that proves who's signed in — it's kept
+// in localStorage so a reload doesn't sign the user out, and attached as a
+// Bearer token on every authenticated request.
+const AUTH_JWT_KEY = "goalhub_jwt";
+
+function getAuthToken() {
+  return localStorage.getItem(AUTH_JWT_KEY);
+}
+
+function setAuthToken(token) {
+  localStorage.setItem(AUTH_JWT_KEY, token);
+}
+
+function clearAuthToken() {
+  localStorage.removeItem(AUTH_JWT_KEY);
+}
+
+function isLoggedIn() {
+  return !!getAuthToken();
+}
+
+// Kicks off the login flow: asks the Worker to create a magic link for this
+// email. In dev mode (no domain onboarded for Email Sending yet — see
+// worker.js) the response includes the link directly instead of only
+// emailing it, so login can be tested without a real inbox.
+async function sendMagicLink(email) {
+  const res = await fetch(`${CHAT_WORKER_BASE}/api/auth/send-magic-link`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email })
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || "Couldn't send the sign-in link.");
+  }
+  return res.json(); // { ok, emailSent, devMagicLink? }
+}
+
+// Call once on page load. If the URL has ?auth_token=... (from clicking the
+// magic link, or the dev-mode link above), redeems it for a JWT, stores it,
+// and strips the token out of the URL so it isn't left sitting in history.
+async function handleAuthCallback() {
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get("auth_token");
+  if (!token) return null;
+
+  params.delete("auth_token");
+  const cleanUrl = window.location.pathname + (params.toString() ? `?${params}` : "") + window.location.hash;
+  window.history.replaceState({}, "", cleanUrl);
+
+  const res = await fetch(`${CHAT_WORKER_BASE}/api/auth/verify?token=${encodeURIComponent(token)}`);
+  if (!res.ok) return null;
+  const data = await res.json();
+  setAuthToken(data.token);
+  return data.user;
+}
+
+// Returns the signed-in user's data, or null if not signed in / the session
+// was revoked server-side. Clears a stale/invalid local token automatically.
+async function getCurrentUser() {
+  const token = getAuthToken();
+  if (!token) return null;
+  const res = await fetch(`${CHAT_WORKER_BASE}/api/me`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (!res.ok) {
+    clearAuthToken();
+    return null;
+  }
+  const data = await res.json();
+  return data.user;
+}
+
+let currentUser = null;
+
+function logout() {
+  clearAuthToken();
+  currentUser = null;
+  serverFavoritesByName = null;
+  renderAuthArea();
+  closeAuthModal();
+  // Server-side favorites are per-account — drop back to whatever's in
+  // localStorage (or nothing) rather than leaving the signed-out UI showing
+  // another account's saved teams.
+  if (viewMode === "favorites" || viewMode === "teams") renderAllTeams();
+  else if (viewMode === "matches") loadMatches();
+}
+
+function renderAuthArea() {
+  const btn = document.getElementById("authBtn");
+  if (currentUser) {
+    btn.textContent = "My Account";
+    btn.classList.add("logged-in");
+  } else {
+    btn.textContent = "Login";
+    btn.classList.remove("logged-in");
+  }
+}
+
+function openAuthModal() {
+  document.getElementById("authModal").classList.add("open");
+  if (currentUser) {
+    document.getElementById("authModalContent").innerHTML = `
+      <div class="auth-form-title">My Account</div>
+      <div class="auth-account-email">${currentUser.email}</div>
+      <button class="auth-logout-btn" onclick="logout()">Log out</button>`;
+  } else {
+    showLoginForm();
+  }
+}
+
+function closeAuthModal() {
+  document.getElementById("authModal").classList.remove("open");
+}
+
+function showLoginForm() {
+  document.getElementById("authModalContent").innerHTML = `
+    <div class="auth-form-title">Log in to GoalHub</div>
+    <div class="auth-form-sub">No password — we'll email you a one-click sign-in link.</div>
+    <form onsubmit="submitMagicLinkForm(event)">
+      <input type="email" class="auth-email-input" id="authEmailInput" placeholder="you@example.com" required>
+      <button type="submit" class="auth-submit-btn" id="authSubmitBtn">Send sign-in link</button>
+    </form>
+    <div id="authStatusMsg"></div>`;
+}
+
+async function submitMagicLinkForm(event) {
+  event.preventDefault();
+  const email = document.getElementById("authEmailInput").value.trim();
+  const btn = document.getElementById("authSubmitBtn");
+  const status = document.getElementById("authStatusMsg");
+  btn.disabled = true;
+  btn.textContent = "Sending…";
+  status.innerHTML = "";
+
+  try {
+    const result = await sendMagicLink(email);
+    if (result.emailSent) {
+      status.innerHTML = `<div class="auth-status-msg">Check <strong>${email}</strong> for your sign-in link. It expires in 15 minutes.</div>`;
+      btn.style.display = "none";
+    } else {
+      // Dev mode: no domain onboarded for Email Sending yet, so the link
+      // can't actually be delivered — show it directly instead.
+      status.innerHTML = `<div class="auth-status-msg">Email sending isn't set up yet — here's your dev sign-in link:<br><a href="${result.devMagicLink}">${result.devMagicLink}</a></div>`;
+      btn.disabled = false;
+      btn.textContent = "Send sign-in link";
+    }
+  } catch (err) {
+    status.innerHTML = `<div class="auth-status-msg">${err.message}</div>`;
+    btn.disabled = false;
+    btn.textContent = "Send sign-in link";
+  }
+}
+
+// Bootstraps auth on page load: redeems ?auth_token= if present, then checks
+// for an existing session, and reflects whichever state wins in the header.
+async function initAuth() {
+  const fromCallback = await handleAuthCallback();
+  currentUser = fromCallback || await getCurrentUser();
+  renderAuthArea();
+  if (currentUser) {
+    await fetchServerFavorites();
+    if (viewMode === "favorites" || viewMode === "teams") renderAllTeams();
+    else if (viewMode === "matches") loadMatches();
+  }
+}
 
 // Leagues where the Worker can fetch a full, untruncated standings table via
 // football-data.org's free tier (proxied through /standings — see worker.js).
@@ -1294,6 +1481,16 @@ function renderMatchRow(f) {
     </div>`;
 }
 
+// null = auto (apply the favorites filter whenever the user has any
+// favorite teams); true/false = the user explicitly toggled it via the
+// banner link below, overriding the auto behavior for this session.
+let showOnlyFavoritesOverride = null;
+
+function toggleFavoritesFilter() {
+  showOnlyFavoritesOverride = showOnlyFavoritesOverride === false ? null : false;
+  loadMatches();
+}
+
 function loadMatches() {
   document.getElementById("liveBtn").classList.toggle("active", statusFilter === "live");
   let fixturesToUse = activeLeague === "All" ? currentFixtures : currentFixtures.filter(f => f.league === activeLeague);
@@ -1303,9 +1500,22 @@ function loadMatches() {
     fixturesToUse = fixturesToUse.filter(f => f.home.name.toLowerCase().includes(term) || f.away.name.toLowerCase().includes(term));
   }
 
+  const favoriteTeamNames = currentUser && serverFavoritesByName ? new Set(serverFavoritesByName.keys()) : getLocalFavoriteTeamNames();
+  const hasFavoriteTeams = favoriteTeamNames.size > 0;
+  const applyFavoritesFilter = hasFavoriteTeams && showOnlyFavoritesOverride !== false;
+  let favoritesBanner = "";
+  if (hasFavoriteTeams) {
+    favoritesBanner = applyFavoritesFilter
+      ? `<div class="favorites-filter-banner">Showing only your favorite teams. <span class="retry-link" onclick="toggleFavoritesFilter()">View all matches</span></div>`
+      : `<div class="favorites-filter-banner"><span class="retry-link" onclick="toggleFavoritesFilter()">Show only my favorite teams</span></div>`;
+  }
+  if (applyFavoritesFilter) {
+    fixturesToUse = fixturesToUse.filter(f => favoriteTeamNames.has(f.home.name) || favoriteTeamNames.has(f.away.name));
+  }
+
   const liveCount = fixturesToUse.filter(f => isLiveStatus(f.status)).length;
 
-  const filterBar = `
+  const filterBar = favoritesBanner + `
     <div class="status-filter-bar">
       <button class="status-filter-btn${statusFilter === "all" ? " active" : ""}" onclick="setStatusFilter('all')">All</button>
       <button class="status-filter-btn status-filter-live${statusFilter === "live" ? " active" : ""}" onclick="setStatusFilter('live')"><span class="live-dot"></span>Live${liveCount ? ` (${liveCount})` : ""}</button>
@@ -1394,7 +1604,7 @@ let viewMode = "matches";
 
 const FAVORITE_TEAMS_KEY = "goalhub_favorite_teams";
 
-function getFavoriteTeamNames() {
+function getLocalFavoriteTeamNames() {
   try {
     return new Set(JSON.parse(localStorage.getItem(FAVORITE_TEAMS_KEY) || "[]"));
   } catch (err) {
@@ -1402,16 +1612,64 @@ function getFavoriteTeamNames() {
   }
 }
 
-function isTeamFavorited(name) {
-  return getFavoriteTeamNames().has(name);
+// Signed-in favorites live server-side (favorites_teams in D1 — synced
+// across devices); signed-out favorites stay local-only, same as before.
+// This map (team_name -> favorites_teams row id) is the in-memory cache of
+// the server list, refreshed on login/logout so isTeamFavorited stays sync.
+let serverFavoritesByName = null; // null = not logged in / not yet fetched
+
+async function fetchServerFavorites() {
+  if (!currentUser) {
+    serverFavoritesByName = null;
+    return;
+  }
+  const token = getAuthToken();
+  const res = await fetch(`${CHAT_WORKER_BASE}/api/user/favorites`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (!res.ok) {
+    serverFavoritesByName = new Map();
+    return;
+  }
+  const data = await res.json();
+  serverFavoritesByName = new Map(data.favorites.map(f => [f.team_name, f.id]));
 }
 
-function toggleFavoriteTeam(name) {
-  const favs = getFavoriteTeamNames();
-  if (favs.has(name)) favs.delete(name);
-  else favs.add(name);
-  localStorage.setItem(FAVORITE_TEAMS_KEY, JSON.stringify([...favs]));
+function isTeamFavorited(name) {
+  if (currentUser && serverFavoritesByName) return serverFavoritesByName.has(name);
+  return getLocalFavoriteTeamNames().has(name);
+}
+
+async function toggleFavoriteTeam(name) {
+  if (currentUser) {
+    const token = getAuthToken();
+    if (serverFavoritesByName && serverFavoritesByName.has(name)) {
+      const id = serverFavoritesByName.get(name);
+      await fetch(`${CHAT_WORKER_BASE}/api/user/favorites/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      serverFavoritesByName.delete(name);
+    } else {
+      const res = await fetch(`${CHAT_WORKER_BASE}/api/user/favorites`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ team_name: name })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (!serverFavoritesByName) serverFavoritesByName = new Map();
+        serverFavoritesByName.set(name, data.favorite.id);
+      }
+    }
+  } else {
+    const favs = getLocalFavoriteTeamNames();
+    if (favs.has(name)) favs.delete(name);
+    else favs.add(name);
+    localStorage.setItem(FAVORITE_TEAMS_KEY, JSON.stringify([...favs]));
+  }
   if (viewMode === "teams" || viewMode === "favorites") renderAllTeams();
+  if (viewMode === "matches") loadMatches(); // homepage favorite-filter may need to re-run
 }
 
 function setViewMode(mode) {
@@ -1834,7 +2092,7 @@ async function renderTeamSquadTab(teamId, teamName) {
     const meta = [p.age ? `${p.age}y` : "", p.nationality ? `${nationalityFlag(p.nationality)} ${p.nationality}`.trim() : ""].filter(Boolean).join(" · ");
     return `
       <div class="lineup-player">
-        ${badgeImg(p.photo, p.name, "lineup-photo")}
+        ${playerPhotoImg(p.photo, p.name, "lineup-photo")}
         ${p.number ? `<span class="lineup-number">${p.number}</span>` : ""}
         <span class="lineup-name">${p.name}</span>
         ${meta ? `<span class="lineup-meta">${meta}</span>` : ""}
@@ -2357,7 +2615,7 @@ async function renderMatchLineupsTab(fixture) {
   });
   const renderPlayer = p => `
     <div class="lineup-player">
-      ${badgeImg(p.strCutout || p.strThumb || "", p.strPlayer, "lineup-photo")}
+      ${playerPhotoImg(p.strCutout || p.strThumb || "", p.strPlayer, "lineup-photo")}
       ${p.strSquadNumber ? `<span class="lineup-number">${p.strSquadNumber}</span>` : ""}
       <span class="lineup-name">${p.strPlayer}</span>
       <span class="lineup-position">${p.strPosition || ""}</span>
@@ -2604,3 +2862,4 @@ document.getElementById("prevDay").addEventListener("click", () => changeDate(-1
 document.getElementById("nextDay").addEventListener("click", () => changeDate(1));
 
 loadFixturesAndRender();
+initAuth();

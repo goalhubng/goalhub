@@ -12,3 +12,15 @@ class_name = "ChatRoom"
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["ChatRoom"]
+
+[[d1_databases]]
+binding = "goalhub_db"
+database_name = "goalhub-db"
+database_id = "264d1943-724c-47dc-91f1-72cda487d203"
+
+# Won't actually deliver until a real domain is onboarded via
+# `wrangler email sending enable yourdomain.com` — see schema.sql's header
+# comment. Until then /api/auth/send-magic-link falls back to returning the
+# link directly in its response so login can still be tested.
+[[send_email]]
+name = "EMAIL"

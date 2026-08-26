@@ -120,6 +120,79 @@ body::after {
 
 .search-icon { font-size: 14px; opacity: 0.6; }
 
+.auth-btn {
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.auth-btn:hover { background: var(--accent-dim); border-color: var(--accent); }
+
+.auth-btn.logged-in { color: var(--accent); border-color: var(--accent); }
+
+.auth-modal-card { max-width: 360px; }
+
+.auth-form-title { font-size: 18px; font-weight: 800; margin-bottom: 6px; }
+.auth-form-sub { font-size: 13px; color: var(--text-dim); margin-bottom: 18px; }
+
+.auth-email-input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.auth-email-input:focus { outline: none; border-color: var(--accent); }
+
+.auth-submit-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  background: var(--accent);
+  border: none;
+  color: #04140c;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.auth-submit-btn:hover { opacity: 0.9; }
+.auth-submit-btn:disabled { opacity: 0.6; cursor: default; }
+
+.auth-status-msg { font-size: 13px; color: var(--text-dim); margin-top: 14px; line-height: 1.5; }
+.auth-status-msg a { color: var(--accent); word-break: break-all; }
+
+.auth-account-email { font-size: 15px; font-weight: 700; margin-bottom: 20px; word-break: break-all; }
+
+.auth-logout-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  background: var(--panel-strong);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.auth-logout-btn:hover { border-color: var(--accent); color: var(--accent); }
+
 .search-wrap input {
   flex: 1;
   border: none;
@@ -560,6 +633,12 @@ h3 {
   padding-bottom: 2px;
 }
 
+.favorites-filter-banner {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-bottom: 12px;
+}
+
 .status-filter-btn {
   flex: 0 0 auto;
   display: flex;
@@ -776,6 +855,7 @@ h3 {
   .site-header { padding: 12px 16px; gap: 12px; }
   .brand-name { font-size: 18px; }
   .search-wrap { width: 100%; order: 3; }
+  .auth-area { order: 2; margin-left: auto; }
   .site-header { flex-wrap: wrap; }
 
   .main-layout { padding: 14px 14px 50px; gap: 14px; }

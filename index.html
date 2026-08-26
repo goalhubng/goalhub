@@ -21,7 +21,20 @@
       <span class="search-icon">🔍</span>
       <input type="text" id="searchInput" placeholder="Search teams… Arsenal, Real Madrid" oninput="searchTeams()">
     </div>
+
+    <div class="auth-area" id="authArea">
+      <button class="auth-btn" id="authBtn" onclick="openAuthModal()">Login</button>
+    </div>
   </header>
+
+  <!-- LOGIN / ACCOUNT MODAL -->
+  <div class="team-modal" id="authModal">
+    <div class="team-modal-backdrop" onclick="closeAuthModal()"></div>
+    <div class="team-modal-card glass auth-modal-card">
+      <button class="team-modal-close" onclick="closeAuthModal()" aria-label="Close">&times;</button>
+      <div id="authModalContent"></div>
+    </div>
+  </div>
 
   <div class="main-layout">
     <!-- LEFT SIDEBAR -->

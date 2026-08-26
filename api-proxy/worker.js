@@ -53,8 +53,8 @@ const CORS_HEADERS = {
   // Tighten this to your actual site's origin once GoalHub is deployed
   // somewhere with a fixed URL — "*" is fine for local testing.
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "GET, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type"
+  "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization"
 };
 
 function jsonResponse(data, status = 200, extraHeaders = {}) {
@@ -89,6 +89,257 @@ async function footballDataFetch(env, path) {
     throw new Error(`football-data.org responded ${res.status}`);
   }
   return res.json();
+}
+
+// --- Auth: email magic-link login, no passwords. A signed HS256 JWT (hand
+// rolled with Web Crypto — Workers has no Node `crypto`, and this is simple
+// enough not to need a library) is the bearer credential; its jti maps to a
+// row in user_sessions so a session can be revoked server-side even though
+// the JWT itself is stateless. See schema.sql for the three tables involved.
+
+const JWT_TTL_SECONDS = 60 * 60 * 24 * 30; // 30 days
+const MAGIC_LINK_TTL_SECONDS = 60 * 15; // 15 minutes
+
+function base64UrlEncode(bytes) {
+  let str = "";
+  for (const b of bytes) str += String.fromCharCode(b);
+  return btoa(str).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+function base64UrlDecode(str) {
+  str = str.replace(/-/g, "+").replace(/_/g, "/");
+  while (str.length % 4) str += "=";
+  const bin = atob(str);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return bytes;
+}
+
+async function hmacKey(secret) {
+  return crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign", "verify"]
+  );
+}
+
+async function signJwt(payload, secret) {
+  const header = { alg: "HS256", typ: "JWT" };
+  const encHeader = base64UrlEncode(new TextEncoder().encode(JSON.stringify(header)));
+  const encPayload = base64UrlEncode(new TextEncoder().encode(JSON.stringify(payload)));
+  const signingInput = `${encHeader}.${encPayload}`;
+  const key = await hmacKey(secret);
+  const sig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(signingInput));
+  const encSig = base64UrlEncode(new Uint8Array(sig));
+  return `${signingInput}.${encSig}`;
+}
+
+// Returns the decoded payload if the signature and expiry are valid, else null.
+// A malformed/garbage token (which any client can send, attacker or not) must
+// never throw here — every failure mode below is a normal "reject it" case,
+// not an exceptional one, so the whole thing is wrapped defensively.
+async function verifyJwt(token, secret) {
+  try {
+    const parts = token.split(".");
+    if (parts.length !== 3) return null;
+    const [encHeader, encPayload, encSig] = parts;
+    const key = await hmacKey(secret);
+    const valid = await crypto.subtle.verify(
+      "HMAC", key, base64UrlDecode(encSig), new TextEncoder().encode(`${encHeader}.${encPayload}`)
+    );
+    if (!valid) return null;
+    const payload = JSON.parse(new TextDecoder().decode(base64UrlDecode(encPayload)));
+    if (typeof payload.exp === "number" && Date.now() / 1000 > payload.exp) return null;
+    return payload;
+  } catch (err) {
+    return null;
+  }
+}
+
+function randomToken() {
+  return base64UrlEncode(crypto.getRandomValues(new Uint8Array(32)));
+}
+
+function isValidEmail(email) {
+  return typeof email === "string" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && email.length <= 254;
+}
+
+async function handleSendMagicLink(request, env) {
+  let body;
+  try {
+    body = await request.json();
+  } catch (err) {
+    return jsonResponse({ error: "invalid JSON body" }, 400);
+  }
+  const email = String(body.email || "").trim().toLowerCase();
+  if (!isValidEmail(email)) return jsonResponse({ error: "invalid email" }, 400);
+
+  const token = randomToken();
+  const now = Math.floor(Date.now() / 1000);
+  await env.goalhub_db
+    .prepare("INSERT INTO magic_links (token, email, expires_at, created_at) VALUES (?, ?, ?, ?)")
+    .bind(token, email, now + MAGIC_LINK_TTL_SECONDS, now)
+    .run();
+
+  const origin = request.headers.get("Origin") || "https://goalhub.pages.dev";
+  const magicLink = `${origin}/?auth_token=${token}`;
+
+  let emailSent = false;
+  if (env.EMAIL) {
+    try {
+      await env.EMAIL.send({
+        to: email,
+        from: { email: "login@goalhub.pages.dev", name: "GoalHub" },
+        subject: "Your GoalHub sign-in link",
+        html: `<p>Click to sign in to GoalHub (expires in 15 minutes):</p><p><a href="${magicLink}">${magicLink}</a></p>`,
+        text: `Sign in to GoalHub: ${magicLink} (expires in 15 minutes)`
+      });
+      emailSent = true;
+    } catch (err) {
+      // Expected until a real domain is onboarded for Email Sending — see
+      // schema.sql's header comment. Falls through to the dev-mode response.
+      emailSent = false;
+    }
+  }
+
+  // Dev-mode fallback: no domain is onboarded for Email Sending yet, so the
+  // link can't actually be delivered. Returning it directly lets the login
+  // flow be tested end-to-end today; once emailSent is reliably true this
+  // branch stops firing on its own and the link stops being exposed here.
+  return jsonResponse({
+    ok: true,
+    emailSent,
+    ...(emailSent ? {} : { devMagicLink: magicLink })
+  });
+}
+
+async function handleVerify(url, env) {
+  const token = url.searchParams.get("token");
+  if (!token) return jsonResponse({ error: "missing token" }, 400);
+
+  const now = Math.floor(Date.now() / 1000);
+  const link = await env.goalhub_db
+    .prepare("SELECT * FROM magic_links WHERE token = ?")
+    .bind(token)
+    .first();
+
+  if (!link || link.used || link.expires_at < now) {
+    return jsonResponse({ error: "invalid or expired link" }, 401);
+  }
+
+  await env.goalhub_db.prepare("UPDATE magic_links SET used = 1 WHERE token = ?").bind(token).run();
+
+  let user = await env.goalhub_db.prepare("SELECT * FROM users WHERE email = ?").bind(link.email).first();
+  if (!user) {
+    await env.goalhub_db
+      .prepare("INSERT INTO users (email, created_at) VALUES (?, ?)")
+      .bind(link.email, now)
+      .run();
+    user = await env.goalhub_db.prepare("SELECT * FROM users WHERE email = ?").bind(link.email).first();
+  }
+
+  const sessionId = randomToken();
+  const expiresAt = now + JWT_TTL_SECONDS;
+  await env.goalhub_db
+    .prepare("INSERT INTO user_sessions (id, user_id, created_at, expires_at) VALUES (?, ?, ?, ?)")
+    .bind(sessionId, user.id, now, expiresAt)
+    .run();
+
+  const jwt = await signJwt({ sub: user.id, email: user.email, jti: sessionId, iat: now, exp: expiresAt }, env.JWT_SECRET);
+
+  return jsonResponse({ token: jwt, user: { id: user.id, email: user.email } });
+}
+
+// Shared by /api/me and every future authenticated route: verifies the JWT,
+// then confirms its session hasn't been revoked in D1 (the part a bare JWT
+// verify alone can't do). Returns the user row or null.
+async function authenticate(request, env) {
+  const auth = request.headers.get("Authorization") || "";
+  const match = auth.match(/^Bearer (.+)$/);
+  if (!match) return null;
+
+  const payload = await verifyJwt(match[1], env.JWT_SECRET);
+  if (!payload) return null;
+
+  const session = await env.goalhub_db
+    .prepare("SELECT * FROM user_sessions WHERE id = ? AND user_id = ?")
+    .bind(payload.jti, payload.sub)
+    .first();
+  if (!session || session.revoked) return null;
+
+  const user = await env.goalhub_db.prepare("SELECT * FROM users WHERE id = ?").bind(payload.sub).first();
+  return user || null;
+}
+
+async function handleMe(request, env) {
+  const user = await authenticate(request, env);
+  if (!user) return jsonResponse({ error: "unauthorized" }, 401);
+  return jsonResponse({ user: { id: user.id, email: user.email, createdAt: user.created_at } });
+}
+
+// --- Server-side favorite teams, synced across devices for signed-in users.
+// team_name is the real unique key (see schema_favorites.sql) — most of
+// GoalHub's roster has no TheSportsDB id at all, only fixtures do.
+
+async function handleGetFavorites(request, env) {
+  const user = await authenticate(request, env);
+  if (!user) return jsonResponse({ error: "unauthorized" }, 401);
+  const { results } = await env.goalhub_db
+    .prepare("SELECT id, team_id, team_name, created_at FROM favorites_teams WHERE user_id = ? ORDER BY created_at DESC")
+    .bind(user.id)
+    .all();
+  return jsonResponse({ favorites: results });
+}
+
+async function handlePostFavorite(request, env) {
+  const user = await authenticate(request, env);
+  if (!user) return jsonResponse({ error: "unauthorized" }, 401);
+
+  let body;
+  try {
+    body = await request.json();
+  } catch (err) {
+    return jsonResponse({ error: "invalid JSON body" }, 400);
+  }
+  const teamName = String(body.team_name || "").trim();
+  const teamId = body.team_id != null ? String(body.team_id) : null;
+  if (!teamName) return jsonResponse({ error: "team_name is required" }, 400);
+
+  const now = Math.floor(Date.now() / 1000);
+  // Idempotent: starring an already-favorited team just returns the existing
+  // row instead of erroring, so the frontend doesn't need to pre-check.
+  await env.goalhub_db
+    .prepare(
+      `INSERT INTO favorites_teams (user_id, team_id, team_name, created_at) VALUES (?, ?, ?, ?)
+       ON CONFLICT(user_id, team_name) DO UPDATE SET team_id = excluded.team_id`
+    )
+    .bind(user.id, teamId, teamName, now)
+    .run();
+
+  const row = await env.goalhub_db
+    .prepare("SELECT id, team_id, team_name, created_at FROM favorites_teams WHERE user_id = ? AND team_name = ?")
+    .bind(user.id, teamName)
+    .first();
+
+  return jsonResponse({ favorite: row }, 201);
+}
+
+async function handleDeleteFavorite(request, env, favoriteId) {
+  const user = await authenticate(request, env);
+  if (!user) return jsonResponse({ error: "unauthorized" }, 401);
+  if (!favoriteId || !/^\d+$/.test(favoriteId)) return jsonResponse({ error: "invalid favorite id" }, 400);
+
+  // Scoped to user_id too — without that, one user could delete another
+  // user's row just by guessing/incrementing the numeric id.
+  const result = await env.goalhub_db
+    .prepare("DELETE FROM favorites_teams WHERE id = ? AND user_id = ?")
+    .bind(favoriteId, user.id)
+    .run();
+
+  if (result.meta.changes === 0) return jsonResponse({ error: "not found" }, 404);
+  return jsonResponse({ ok: true });
 }
 
 // --- Per-match chat + score-prediction room. One DO instance per match ID
@@ -218,6 +469,36 @@ export default {
       }
       const stub = env.CHAT_ROOM.getByName(matchId);
       return stub.fetch(request);
+    }
+
+    // Auth routes are per-request (POST bodies, bearer tokens) and never
+    // cacheable, so they're handled before the GET-response cache below.
+    if (
+      (url.pathname === "/api/auth/send-magic-link" && request.method === "POST") ||
+      (url.pathname === "/api/auth/verify" && request.method === "GET") ||
+      (url.pathname === "/api/me" && request.method === "GET")
+    ) {
+      try {
+        if (url.pathname === "/api/auth/send-magic-link") return await handleSendMagicLink(request, env);
+        if (url.pathname === "/api/auth/verify") return await handleVerify(url, env);
+        return await handleMe(request, env);
+      } catch (err) {
+        return jsonResponse({ error: "internal error" }, 500);
+      }
+    }
+
+    if (url.pathname === "/api/user/favorites" || url.pathname.startsWith("/api/user/favorites/")) {
+      try {
+        if (url.pathname === "/api/user/favorites" && request.method === "GET") return await handleGetFavorites(request, env);
+        if (url.pathname === "/api/user/favorites" && request.method === "POST") return await handlePostFavorite(request, env);
+        if (request.method === "DELETE") {
+          const favoriteId = url.pathname.slice("/api/user/favorites/".length);
+          return await handleDeleteFavorite(request, env, favoriteId);
+        }
+        return jsonResponse({ error: "unknown endpoint" }, 404);
+      } catch (err) {
+        return jsonResponse({ error: "internal error" }, 500);
+      }
     }
 
     const cache = caches.default;
