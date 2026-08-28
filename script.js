@@ -883,7 +883,33 @@ const leagueLogos = {
   "Super League GR": "https://r2.thesportsdb.com/images/media/league/badge/sni7f51782459204.png",
   "Jupiler Pro": "https://r2.thesportsdb.com/images/media/league/badge/xj8azr1786316931.png",
   "MLS": "https://r2.thesportsdb.com/images/media/league/badge/dqo6r91549878326.png",
-  "Liga Profesional Argentina": "https://r2.thesportsdb.com/images/media/league/badge/rk9xhx1768238251.png"
+  "Liga Profesional Argentina": "https://r2.thesportsdb.com/images/media/league/badge/rk9xhx1768238251.png",
+  "Austrian Bundesliga": "https://r2.thesportsdb.com/images/media/league/badge/vcgyu71686617925.png",
+  "Austrian Erste Liga": "https://r2.thesportsdb.com/images/media/league/badge/cfk37g1583582239.png",
+  "EFL Championship": "https://r2.thesportsdb.com/images/media/league/badge/ty5a681688770169.png",
+  "La Liga 2": "https://r2.thesportsdb.com/images/media/league/badge/r7u6821688425700.png",
+  "Ligue 2": "https://r2.thesportsdb.com/images/media/league/badge/aofb771742983333.png",
+  "Serie B": "https://r2.thesportsdb.com/images/media/league/badge/uf5kph1598011132.png",
+  "2. Bundesliga": "https://r2.thesportsdb.com/images/media/league/badge/hl40981534764789.png",
+  "Nigeria NPFL": "https://r2.thesportsdb.com/images/media/league/badge/k4hgin1590183498.png",
+  "Brazil Serie B": "https://r2.thesportsdb.com/images/media/league/badge/iiz0gf1778446845.png",
+  "Argentina Primera Nacional": "https://r2.thesportsdb.com/images/media/league/badge/u5tbaw1762466392.png",
+  "Turkey 1.Lig": "https://r2.thesportsdb.com/images/media/league/badge/teu8g81784991514.png",
+  "Poland Ekstraklasa": "https://r2.thesportsdb.com/images/media/league/badge/l3jovw1516960585.png",
+  "Belgium Challenger Pro": "https://r2.thesportsdb.com/images/media/league/badge/2nwcvo1786316608.png",
+  "Denmark Superliga": "https://r2.thesportsdb.com/images/media/league/badge/28uq381687624585.png",
+  "Sweden Allsvenskan": "https://r2.thesportsdb.com/images/media/league/badge/denok11707459183.png",
+  "Norway Eliteserien": "https://r2.thesportsdb.com/images/media/league/badge/owo80l1512822583.png",
+  "Mexico Liga de Expansion": "https://r2.thesportsdb.com/images/media/league/badge/2h0yz01615330546.png",
+  "Egypt Premier League": "https://r2.thesportsdb.com/images/media/league/badge/v0iz601786057987.png",
+  "South Africa PSL": "https://r2.thesportsdb.com/images/media/league/badge/e59xj11725174551.png",
+  "Morocco Botola": "https://r2.thesportsdb.com/images/media/league/badge/bhuork1638558615.png",
+  "USA USL Championship": "https://r2.thesportsdb.com/images/media/league/badge/uh4zas1688513782.png",
+  "Japan J2 League": "https://r2.thesportsdb.com/images/media/league/badge/b3xlmj1675170570.png",
+  "South Korea K League 2": "https://r2.thesportsdb.com/images/media/league/badge/p9k1qn1628430716.png",
+  "Australia A-League": "https://r2.thesportsdb.com/images/media/league/badge/2u78lm1638459575.png",
+  "UAE Pro League": "https://r2.thesportsdb.com/images/media/league/badge/95pes01643234997.png",
+  "MLS Next Pro": "https://r2.thesportsdb.com/images/media/league/badge/vokzs71650475719.png"
 };
 
 // Curated "marquee" clubs per league used to pick an eye-catching featured match.
@@ -1334,6 +1360,15 @@ function matchStatusDisplay(f) {
   if (!hasScore || f.status === "NS" || !f.status) {
     return { primary: f.time || "TBD", tag: "" };
   }
+  // TheSportsDB's free tier doesn't expose a live match minute — without
+  // this, a live game here would only ever show a static "1st Half"/
+  // "Half-time" label instead of an actual, moving clock. It does link
+  // each event to its real API-Football fixture ID (idAPIfootball), so
+  // when that same match is also present in the Live Now data we already
+  // fetched (real minutes, from API-Football), use its real minute instead.
+  if (isLiveStatus(f.status) && f.apiFootballId && liveFixturesById[f.apiFootballId]) {
+    return { primary: `${f.homeScore} - ${f.awayScore}`, tag: afMinuteLabel(liveFixturesById[f.apiFootballId]) };
+  }
   const label = STATUS_LABELS[f.status] || f.status || "LIVE";
   return { primary: `${f.homeScore} - ${f.awayScore}`, tag: label };
 }
@@ -1474,6 +1509,7 @@ async function fetchFixturesForWindow(centerDate) {
         anyRequestSucceeded = true;
         fixturesByLeague.push((data.events || []).map(e => ({
           id: e.idEvent,
+          apiFootballId: e.idAPIfootball || null, // links this event to the real-minute data in liveFixturesById — see matchStatusDisplay()
           league,
           time: (e.strTimeLocal || e.strTime || "").slice(0, 5),
           date: e.dateEventLocal || e.dateEvent,
@@ -1602,6 +1638,46 @@ function getFreshCachedLiveFixtures() {
   }
 }
 
+// Maps API-Football's live status codes onto TheSportsDB's vocabulary
+// (used for f.status everywhere else on the site).
+const AF_STATUS_TO_SPORTSDB_STATUS = { "1H": "1H", "2H": "2H", "HT": "HT", "ET": "ET", "BT": "HT", "P": "HT", "LIVE": "1H", "FT": "FT" };
+
+// TheSportsDB's free-tier status/score can sit stale well after a match has
+// actually kicked off — seen firsthand showing "NS" (not started), no
+// score, for a match that was 44 minutes in with a real 0-1 scoreline per
+// API-Football. Since a mismatch here means "not started" is simply wrong,
+// not just imprecise, this overrides the status AND score from the live
+// source whenever the two disagree — not just the display-only minute
+// label — so a genuinely live match doesn't sit looking like it hasn't
+// kicked off yet, and the "Live" filter / auto-refresh (which key off
+// f.status) pick it up correctly too.
+function reconcileLiveStatuses() {
+  let changed = false;
+  currentFixtures.forEach(f => {
+    if (!f.apiFootballId) return;
+    const live = liveFixturesById[f.apiFootballId];
+    if (!live) return;
+    const mappedStatus = AF_STATUS_TO_SPORTSDB_STATUS[live.statusShort];
+    if (!mappedStatus) return;
+    if (f.status !== mappedStatus || f.homeScore !== live.home.score || f.awayScore !== live.away.score) {
+      f.status = mappedStatus;
+      f.homeScore = live.home.score;
+      f.awayScore = live.away.score;
+      changed = true;
+    }
+  });
+  return changed;
+}
+
+// Called whenever liveFixturesById is refreshed, so a real live minute (and
+// now, a real status/score correction — see reconcileLiveStatuses) that
+// just became available shows up in the already-rendered "All Matches"
+// list without waiting for its own separate 60s cycle or a user action.
+function refreshLiveMinutesInMatchList() {
+  reconcileLiveStatuses();
+  if (viewMode === "matches" && !fixturesLoading) loadMatches();
+}
+
 async function renderLiveNowSection() {
   const grid = document.getElementById("liveNowGrid");
   let fixtures;
@@ -1628,11 +1704,17 @@ async function renderLiveNowSection() {
   const live = fixtures.filter(f => AF_IN_PROGRESS_STATUSES.has(f.statusShort));
 
   if (live.length === 0) {
+    // Clear rather than leave stale — otherwise a match that just ended
+    // would keep cross-referencing to its last-known (now wrong) minute in
+    // the "All Matches" list (see matchStatusDisplay) indefinitely.
+    liveFixturesById = {};
     grid.innerHTML = `<div class="live-now-empty">No live matches right now. Check back during a matchday, or browse today's fixtures below.</div>`;
+    refreshLiveMinutesInMatchList();
     return;
   }
 
   liveFixturesById = Object.fromEntries(live.map(f => [f.id, f]));
+  refreshLiveMinutesInMatchList();
 
   const staleBanner = stale
     ? `<div class="cache-banner live-now-stale-banner">Reconnecting — showing scores from ${Math.max(1, Math.round((Date.now() - stale) / 1000))}s ago.</div>`
@@ -3517,6 +3599,21 @@ async function renderFormGuide(fixture, homeResultsFull, awayResultsFull) {
     </div>`;
 }
 
+// One row of a real past meeting between these two teams (from API-Football
+// via the Worker's /h2h route — see renderMatchH2HTab).
+function renderH2HMeetingRow(m) {
+  return `
+    <div class="team-result-row">
+      <div class="team-result-date">${formatApiDate(m.date.slice(0, 10))}</div>
+      <div class="team-result-teams">
+        <span class="team-result-team">${badgeImg(m.home.logo, m.home.name, "")}${m.home.name}</span>
+        <span class="team-result-vs">vs</span>
+        <span class="team-result-team">${badgeImg(m.away.logo, m.away.name, "")}${m.away.name}</span>
+      </div>
+      <div class="team-result-score">${m.home.score ?? "-"} - ${m.away.score ?? "-"}</div>
+    </div>`;
+}
+
 async function renderMatchH2HTab(fixture) {
   const [homeData, awayData] = await Promise.all([
     fetchJsonWithRetry(`${SPORTSDB_BASE}/eventslast.php?id=${fixture.home.id}`),
@@ -3525,8 +3622,28 @@ async function renderMatchH2HTab(fixture) {
   const homeResults = homeData.results || [];
   const awayResults = awayData.results || [];
   const formHtml = await renderFormGuide(fixture, homeResults, awayResults);
-  const note = `<div class="h2h-note">Our data source doesn't provide multi-season head-to-head history — here's each team's most recent result instead.</div>`;
-  return formHtml + note + renderH2HResultRow(fixture.home.name, homeResults[0]) + renderH2HResultRow(fixture.away.name, awayResults[0]);
+
+  // Real multi-season head-to-head, via the two teams' actual API-Football
+  // fixture history — not guessed or invented. Falls back to each team's
+  // most recent result (the old behavior) if the lookup fails or these two
+  // teams genuinely have no meetings on record, rather than showing nothing.
+  let h2hHtml;
+  try {
+    const res = await fetch(`${CHAT_WORKER_BASE}/h2h?home=${fixture.home.id}&away=${fixture.away.id}`);
+    const data = await res.json();
+    if (data.available && data.meetings && data.meetings.length > 0) {
+      h2hHtml = `
+        <div class="team-modal-section-title">Head-to-Head</div>
+        ${data.meetings.map(renderH2HMeetingRow).join("")}`;
+    } else {
+      throw new Error("no H2H meetings available");
+    }
+  } catch (err) {
+    const note = `<div class="h2h-note">Head-to-head history isn't available right now — here's each team's most recent result instead.</div>`;
+    h2hHtml = note + renderH2HResultRow(fixture.home.name, homeResults[0]) + renderH2HResultRow(fixture.away.name, awayResults[0]);
+  }
+
+  return formHtml + h2hHtml;
 }
 
 document.getElementById("prevDay").addEventListener("click", () => changeDate(-1));
@@ -3603,3 +3720,12 @@ setInterval(() => {
   const hasLive = currentFixtures.some(f => isLiveStatus(f.status));
   if (hasLive) loadFixturesAndRender();
 }, 60000);
+
+// --- Keep liveFixturesById current: it's the source of real live match
+// minutes cross-referenced into the "All Matches" list (matchStatusDisplay)
+// as well as the Live Now grid itself. Without this it was only ever
+// fetched once at page load, then quietly went stale as matches
+// progressed, finished, or kicked off — the polling interval here matches
+// the Worker's own 20s cache for this route, so this adds no real load
+// beyond what that shared edge cache already amortizes across visitors.
+setInterval(renderLiveNowSection, 20000);

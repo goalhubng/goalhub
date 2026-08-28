@@ -779,17 +779,22 @@ export default {
         ]);
         payload = { last: last.response || [], next: next.response || [] };
       } else if (url.pathname === "/live-fixtures") {
-        // Homepage "Live Now" grid. Prefers matches from GoalHub's own
-        // tracked top leagues (LEAGUE_IDS above) so the grid shows
-        // recognizable football first, falling back to any live match
-        // to fill out to 6 if fewer than 6 of those are live right now.
+        // Homepage "Live Now" grid, AND the source of real live match
+        // minutes for the "All Matches" list (see script.js's
+        // matchStatusDisplay, which cross-references a TheSportsDB fixture
+        // to its match here via idAPIfootball — TheSportsDB's own feed has
+        // no live-minute field). All tracked-league live matches are
+        // returned uncapped so that cross-reference actually covers every
+        // live match, not just a homepage-sized sample; only the
+        // non-tracked "rest" fallback (used to pad the homepage grid when
+        // few tracked-league games are live) is capped.
         const data = await apiFootballFetch(env, "/fixtures?live=all");
         const all = data.response || [];
         const trackedLeagueIds = new Set(Object.values(LEAGUE_IDS));
         const leagueIdToGoalhubName = Object.fromEntries(Object.entries(LEAGUE_IDS).map(([name, id]) => [id, name]));
         const tracked = all.filter(f => trackedLeagueIds.has(f.league.id));
         const rest = all.filter(f => !trackedLeagueIds.has(f.league.id));
-        const chosen = [...tracked, ...rest].slice(0, 6);
+        const chosen = tracked.length >= 6 ? tracked : [...tracked, ...rest].slice(0, 6);
         payload = {
           fixtures: chosen.map(f => ({
             id: f.fixture.id,
@@ -837,6 +842,55 @@ export default {
             startXI: (t.startXI || []).map(p => ({ name: p.player.name, pos: p.player.pos, number: p.player.number }))
           }))
         };
+      } else if (url.pathname === "/h2h") {
+        // Real multi-season head-to-head history for the match modal's H2H
+        // tab — previously just "each team's most recent result" because
+        // TheSportsDB's free tier has no H2H endpoint. API-Football does
+        // (/fixtures/headtohead), but it's keyed by API-Football's own team
+        // IDs, not TheSportsDB's (the IDs used everywhere else on the
+        // site) — so this bridges the two via TheSportsDB's own
+        // idAPIfootball cross-reference field on lookupteam.php, then
+        // calls API-Football with the real IDs that comes back with.
+        const homeId = url.searchParams.get("home");
+        const awayId = url.searchParams.get("away");
+        if (!homeId || !awayId) return jsonResponse({ error: "missing home/away team id" }, 400);
+        // TheSportsDB's shared free key occasionally rate-limits with a
+        // plain-text Cloudflare error page instead of JSON — parse
+        // defensively so that shows up as "H2H temporarily unavailable"
+        // rather than a raw parse-error 502.
+        const lookupTeam = async id => {
+          const res = await fetch(`${SPORTSDB_BASE_WORKER}/lookupteam.php?id=${id}`);
+          if (!res.ok) return null;
+          try { return await res.json(); } catch (err) { return null; }
+        };
+        const [homeTeamData, awayTeamData] = await Promise.all([lookupTeam(homeId), lookupTeam(awayId)]);
+        if (!homeTeamData || !awayTeamData) {
+          return jsonResponse({ available: false, meetings: [] }, 200); // don't cache a lookup failure — worth retrying on the next request
+        }
+        const homeAfId = homeTeamData.teams && homeTeamData.teams[0] && homeTeamData.teams[0].idAPIfootball;
+        const awayAfId = awayTeamData.teams && awayTeamData.teams[0] && awayTeamData.teams[0].idAPIfootball;
+        if (!homeAfId || !awayAfId) {
+          payload = { available: false, meetings: [] };
+        } else {
+          const h2hData = await apiFootballFetch(env, `/fixtures/headtohead?h2h=${homeAfId}-${awayAfId}&last=10`);
+          // API-Football returns 200 + an empty response[] with an
+          // `errors.rateLimit` note when its own free-tier limit is hit,
+          // rather than a non-200 status — surfacing as a normal-looking
+          // "no meetings" that would otherwise get cached and shown to
+          // real users for 2 minutes even after the limit clears.
+          if (h2hData.errors && Object.keys(h2hData.errors).length > 0) {
+            return jsonResponse({ available: false, meetings: [] }, 200);
+          }
+          payload = {
+            available: true,
+            meetings: (h2hData.response || []).map(f => ({
+              date: f.fixture.date,
+              league: f.league.name,
+              home: { name: f.teams.home.name, logo: f.teams.home.logo, score: f.goals.home, winner: f.teams.home.winner },
+              away: { name: f.teams.away.name, logo: f.teams.away.logo, score: f.goals.away, winner: f.teams.away.winner }
+            }))
+          };
+        }
       } else if (url.pathname === "/team-search") {
         const name = url.searchParams.get("name");
         if (!name) return jsonResponse({ error: "missing name" }, 400);
