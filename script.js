@@ -1356,8 +1356,16 @@ function sleep(ms) {
   return new Promise(r => setTimeout(r, ms));
 }
 
+// Local calendar date, not UTC — toISOString() would give the wrong day for
+// roughly half the day, for most of the world. At 00:52 local time in
+// UTC+1 (e.g. Nigeria), toISOString() is still on "23:52 the previous day"
+// in UTC, so it'd report yesterday's date as "today" — real users would see
+// yesterday's fixtures/live-status until UTC catches up to their calendar.
 function dateKey(date) {
-  return date.toISOString().slice(0, 10);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }
 
 function formatDateLabel(date) {
@@ -2241,6 +2249,18 @@ function toggleMoreLeagues() {
   const toggleLabel = document.querySelector("#compToggle span");
   toggleLabel.textContent = expanded ? "Show less" : `+${hiddenCount} more`;
 }
+
+// Footer league links — every league GoalHub actually tracks, alphabetised,
+// each a real working link into the site (jumpToLeague), not a copy of
+// another site's link list.
+function renderFooterLeagues() {
+  const grid = document.getElementById("footerLeaguesGrid");
+  if (!grid) return;
+  const sorted = [...leagues].sort((a, b) => a.localeCompare(b));
+  grid.innerHTML = sorted.map(league => `
+    <a href="#topLeaguesSection" class="footer-league-link" onclick="jumpToLeague('${league.replace(/'/g, "\\'")}'); return false;">${league}</a>`).join("");
+}
+renderFooterLeagues();
 
 // --- Today's Featured: highlights one of the currently-loaded real
 // fixtures, preferring a marquee matchup, so it always reflects an actual
