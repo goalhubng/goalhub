@@ -936,13 +936,79 @@ function playerPhotoImg(photo, name, cssClass) {
   // jerseyIcon()'s data URI has unescaped single quotes (encodeURIComponent
   // doesn't touch them), so it can't be inlined as a '...'-quoted JS string
   // literal here — call the function directly instead of embedding its value.
-  return `<img class="${cssClass}" src="${src}" alt="${name}" loading="lazy" onerror="this.onerror=null; this.src=jerseyIcon();">`;
+  return `<img class="${cssClass}" src="${src}" alt="${name}" loading="lazy" decoding="async" onerror="this.onerror=null; this.src=jerseyIcon();">`;
 }
 
 function onBadgeError(imgEl, name) {
   imgEl.onerror = null;
   imgEl.src = initialsAvatar(name);
 }
+
+// --- Deep linking: reflect the open team/match modal in the URL
+// (?team=/?match=/?livematch=) via pushState, so a link can be shared and
+// the back button closes the modal instead of leaving the page. Only real
+// identifiers already in memory are used — never anything invented.
+let suppressUrlPush = false; // set while restoring state from popstate/initial load
+
+function teamSlug(name) {
+  return name.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+}
+
+function pushModalUrl(param, value) {
+  if (suppressUrlPush) return;
+  const current = new URLSearchParams(window.location.search);
+  // openTeamModal resolves its team ID asynchronously, so this can fire
+  // after a popstate replay already put the URL in this exact state (its
+  // own suppressUrlPush window closes before that awaited call returns) —
+  // skip the redundant push rather than corrupt the back/forward stack
+  // with a duplicate entry.
+  if (current.get(param) === value && [...current.keys()].length === 1) return;
+  const url = new URL(window.location.href);
+  url.search = "";
+  url.searchParams.set(param, value);
+  history.pushState({ [param]: value }, "", url);
+}
+
+function clearModalUrl() {
+  if (suppressUrlPush) return;
+  const url = new URL(window.location.href);
+  if (!url.search) return; // already clean — avoid a redundant history entry
+  url.search = "";
+  history.pushState({}, "", url);
+}
+
+// Opens whichever modal (if any) the current URL's query string points to.
+// Called once on initial load (after fixtures/live data are in memory) and
+// again on every popstate (back/forward). Silently does nothing if the
+// referenced team/match can't be resolved yet (e.g. a match from a
+// different date than what's currently loaded) rather than erroring.
+function applyUrlState() {
+  const params = new URLSearchParams(window.location.search);
+  const teamParam = params.get("team");
+  const matchParam = params.get("match");
+  const liveParam = params.get("livematch");
+
+  if (!teamParam && document.getElementById("teamModal").classList.contains("open")) closeTeamModal();
+  if (!matchParam && document.getElementById("matchModal").classList.contains("open")) closeMatchModal();
+  if (!liveParam && document.getElementById("liveMatchModal").classList.contains("open")) closeLiveMatchModal();
+
+  if (teamParam) {
+    const team = allTeams.find(t => teamSlug(t.name) === teamParam);
+    if (team) openTeamModal(team.id, team.name, team.logo, team.league);
+  }
+  if (matchParam && fixturesById[matchParam]) {
+    openMatchModal(matchParam);
+  }
+  if (liveParam && liveFixturesById[liveParam]) {
+    openLiveMatchModal(liveParam);
+  }
+}
+
+window.addEventListener("popstate", () => {
+  suppressUrlPush = true;
+  applyUrlState();
+  suppressUrlPush = false;
+});
 
 const matchesDiv = document.getElementById("matches");
 let activeLeague = "All";
@@ -1228,7 +1294,7 @@ function badgeImg(logo, name, cssClass) {
   // go straight to the initials avatar instead of leaving <img src=""> to
   // silently render blank.
   const src = logo || initialsAvatar(name);
-  return `<img class="${cssClass}" src="${src}" alt="${name}" loading="lazy" onerror="onBadgeError(this,'${name.replace(/'/g, "")}')">`;
+  return `<img class="${cssClass}" src="${src}" alt="${name}" loading="lazy" decoding="async" onerror="onBadgeError(this,'${name.replace(/'/g, "")}')">`;
 }
 
 // The API doesn't always supply a team badge on the events-by-day endpoint;
@@ -1429,6 +1495,33 @@ async function fetchFixturesForWindow(centerDate) {
   return { fixtures: fixturesByLeague.flat(), ok: anyRequestSucceeded };
 }
 
+// --- Offline/outage fallback cache: the last successfully-fetched fixture
+// list for each date, kept in localStorage so a total API outage (or a
+// dropped connection on a slow/mobile network) shows real, previously-seen
+// results with an honest "cached" label instead of an empty dead end. Never
+// used to invent data — only ever replays what actually loaded before.
+const FIXTURES_CACHE_PREFIX = "goalhub_cache_fixtures_";
+
+function cacheFixtures(key, fixtures) {
+  try {
+    localStorage.setItem(FIXTURES_CACHE_PREFIX + key, JSON.stringify({ fixtures, cachedAt: Date.now() }));
+  } catch (err) { /* storage full/unavailable — caching is best-effort only */ }
+}
+
+function getCachedFixtures(key) {
+  try {
+    const raw = localStorage.getItem(FIXTURES_CACHE_PREFIX + key);
+    return raw ? JSON.parse(raw) : null;
+  } catch (err) {
+    return null;
+  }
+}
+
+// Set to the cache timestamp while currentFixtures is standing in for a
+// failed live fetch (see loadFixturesAndRender), so loadMatches() can show
+// an honest "showing cached results" banner; null once a fetch succeeds.
+let fixturesStaleAt = null;
+
 async function loadFixturesAndRender() {
   fixturesLoading = true;
   matchesDiv.innerHTML = skeletonRows(6);
@@ -1437,16 +1530,33 @@ async function loadFixturesAndRender() {
   document.getElementById("calendarDayNum").textContent = currentDate.getDate();
   document.getElementById("datePickerInput").value = dateKey(currentDate);
 
+  const cacheKey = dateKey(currentDate);
   const result = await fetchFixturesForWindow(currentDate);
-  currentFixtures = result.fixtures;
-  fixturesById = Object.fromEntries(currentFixtures.map(f => [f.id, f]));
   fixturesLoading = false;
 
   if (!result.ok) {
+    const cached = getCachedFixtures(cacheKey);
+    if (cached) {
+      currentFixtures = cached.fixtures;
+      fixturesById = Object.fromEntries(currentFixtures.map(f => [f.id, f]));
+      fixturesStaleAt = cached.cachedAt;
+      currentFixtures = cached.fixtures;
+      fixturesById = Object.fromEntries(currentFixtures.map(f => [f.id, f]));
+      loadMatches();
+      renderFeaturedMatch();
+      return;
+    }
+    currentFixtures = [];
+    fixturesById = {};
     matchesDiv.innerHTML = `<div class="no-results">Couldn't reach the live football API right now (it can be flaky under load). <span class="retry-link" onclick="loadFixturesAndRender()">Tap to retry</span>.</div>`;
     document.getElementById("featured").innerHTML = `<div class="team-no-fixture">Unavailable — retry above.</div>`;
     return;
   }
+
+  fixturesStaleAt = null;
+  currentFixtures = result.fixtures;
+  fixturesById = Object.fromEntries(currentFixtures.map(f => [f.id, f]));
+  cacheFixtures(cacheKey, currentFixtures);
   loadMatches();
   renderFeaturedMatch();
 }
@@ -1467,17 +1577,52 @@ function afMinuteLabel(f) {
 // Homepage "Live Now" — real fixtures from API-Football (via the Worker's
 // /live-fixtures route), independent of the date bar since "live" always
 // means right now regardless of which day is selected below.
+// Live scores go stale fast, so — unlike the day's fixture list — a cached
+// replay is only trusted for a couple of minutes; past that a live score
+// shown as current would be actively misleading, so it falls through to
+// the honest "couldn't load" message instead.
+const LIVE_CACHE_KEY = "goalhub_cache_live_fixtures";
+const LIVE_CACHE_MAX_AGE_MS = 2 * 60 * 1000;
+
+function cacheLiveFixtures(fixtures) {
+  try {
+    localStorage.setItem(LIVE_CACHE_KEY, JSON.stringify({ fixtures, cachedAt: Date.now() }));
+  } catch (err) { /* best-effort only */ }
+}
+
+function getFreshCachedLiveFixtures() {
+  try {
+    const raw = localStorage.getItem(LIVE_CACHE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (Date.now() - parsed.cachedAt > LIVE_CACHE_MAX_AGE_MS) return null;
+    return parsed;
+  } catch (err) {
+    return null;
+  }
+}
+
 async function renderLiveNowSection() {
   const grid = document.getElementById("liveNowGrid");
   let fixtures;
+  let stale = null;
   try {
     const res = await fetch(`${CHAT_WORKER_BASE}/live-fixtures`);
     if (!res.ok) throw new Error("bad response");
     const data = await res.json();
     fixtures = data.fixtures || [];
+    cacheLiveFixtures(fixtures);
   } catch (err) {
-    grid.innerHTML = `<div class="live-now-empty">Couldn't load live matches right now. <span class="retry-link" onclick="renderLiveNowSection()">Tap to retry</span>.</div>`;
-    return;
+    const cached = getFreshCachedLiveFixtures();
+    if (!cached) {
+      grid.innerHTML = `<div class="live-now-empty">Couldn't load live matches right now. <span class="retry-link" onclick="renderLiveNowSection()">Tap to retry</span>.</div>`;
+      return;
+    }
+    fixtures = cached.fixtures;
+    stale = cached.cachedAt;
+    // Cached live data is only ever shown for up to LIVE_CACHE_MAX_AGE_MS,
+    // so retry sooner than the normal 60s poll to get back to real-time.
+    setTimeout(renderLiveNowSection, 8000);
   }
 
   const live = fixtures.filter(f => AF_IN_PROGRESS_STATUSES.has(f.statusShort));
@@ -1489,7 +1634,11 @@ async function renderLiveNowSection() {
 
   liveFixturesById = Object.fromEntries(live.map(f => [f.id, f]));
 
-  grid.innerHTML = live.map(f => {
+  const staleBanner = stale
+    ? `<div class="cache-banner live-now-stale-banner">Reconnecting — showing scores from ${Math.max(1, Math.round((Date.now() - stale) / 1000))}s ago.</div>`
+    : "";
+
+  grid.innerHTML = staleBanner + live.map(f => {
     const watching = notifyMeFixtures.has(f.id);
     return `
     <div class="live-game-card hover-glow" onclick="openLiveMatchModal('${f.id}')">
@@ -1618,11 +1767,13 @@ function openLiveMatchModal(fixtureId) {
     <div class="match-modal-tab-body" id="liveMatchTabBody"></div>`;
   document.getElementById("liveMatchModal").classList.add("open");
   showLiveMatchTab("timeline");
+  pushModalUrl("livematch", fixtureId);
 }
 
 function closeLiveMatchModal() {
   document.getElementById("liveMatchModal").classList.remove("open");
   currentLiveFixture = null;
+  clearModalUrl();
 }
 
 async function fetchLiveFixtureDetails(fixtureId) {
@@ -1847,7 +1998,14 @@ function loadMatches() {
 
   const liveCount = fixturesToUse.filter(f => isLiveStatus(f.status)).length;
 
-  const filterBar = favoritesBanner + `
+  const staleBanner = fixturesStaleAt
+    ? (() => {
+        const mins = Math.max(0, Math.round((Date.now() - fixturesStaleAt) / 60000));
+        return `<div class="cache-banner">Showing results from ${mins === 0 ? "just now" : mins + " min ago"} — live API unavailable right now. <span class="retry-link" onclick="loadFixturesAndRender()">Tap to retry</span>.</div>`;
+      })()
+    : "";
+
+  const filterBar = staleBanner + favoritesBanner + `
     <div class="status-filter-bar">
       <button class="status-filter-btn${statusFilter === "all" ? " active" : ""}" onclick="setStatusFilter('all')">All</button>
       <button class="status-filter-btn status-filter-live${statusFilter === "live" ? " active" : ""}" onclick="setStatusFilter('live')"><span class="live-dot"></span>Live${liveCount ? ` (${liveCount})` : ""}</button>
@@ -2371,10 +2529,12 @@ async function openTeamModal(teamId, teamName, teamLogo, teamLeague) {
 
   if (!teamId) {
     document.getElementById("teamTabBody").innerHTML = `<div class="team-no-fixture">Full data isn't available for ${teamName} yet — showing what we have.</div>`;
+    pushModalUrl("team", teamSlug(teamName));
     return;
   }
 
   showTeamTab("overview");
+  pushModalUrl("team", teamSlug(teamName));
 }
 
 async function showTeamTab(tab) {
@@ -2621,6 +2781,7 @@ async function renderTeamSquadTab(teamId, teamName) {
 function closeTeamModal() {
   document.getElementById("teamModal").classList.remove("open");
   currentTeamModal = null;
+  clearModalUrl();
 }
 
 // --- Match detail modal: Info / Line-ups / Table / H2H tabs (deliberately
@@ -2677,12 +2838,14 @@ function openMatchModal(matchId) {
 
   document.getElementById("matchModal").classList.add("open");
   showMatchTab("info");
+  pushModalUrl("match", matchId);
 }
 
 function closeMatchModal() {
   document.getElementById("matchModal").classList.remove("open");
   currentMatchFixture = null;
   closeChatSocket();
+  clearModalUrl();
 }
 
 // Standalone standings view (the "League Standings" shortcut on each league
@@ -3369,8 +3532,20 @@ async function renderMatchH2HTab(fixture) {
 document.getElementById("prevDay").addEventListener("click", () => changeDate(-1));
 document.getElementById("nextDay").addEventListener("click", () => changeDate(1));
 
-loadFixturesAndRender();
-renderLiveNowSection();
+// A ?team= link doesn't depend on fixtures data (allTeams is already in
+// memory) so it's resolved right away — waiting on the fixtures/live-now
+// fetches below first (which, fetching ~40 leagues one at a time against a
+// free API, can take many seconds) would otherwise leave a shared team
+// link sitting blank for no reason. ?match=/?livematch= genuinely do need
+// that data, so they're resolved by the second pass once it's in.
+// suppressUrlPush stays true across both passes so neither one writes a
+// redundant history entry for the URL that's already there.
+suppressUrlPush = true;
+applyUrlState();
+Promise.all([loadFixturesAndRender(), renderLiveNowSection()]).then(() => {
+  applyUrlState();
+  suppressUrlPush = false;
+});
 initAuth();
 
 // --- Dark/light theme toggle, persisted to localStorage. The actual switch

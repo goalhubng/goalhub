@@ -24,6 +24,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Team/league badge CDNs — preconnect so the first badge requests skip
+       the DNS+TLS handshake, since ~800 of them load on a typical visit. -->
+  <link rel="preconnect" href="https://r2.thesportsdb.com">
+  <link rel="preconnect" href="https://upload.wikimedia.org">
   <link rel="stylesheet" href="styles.css">
   <script>
     // Applied before first paint (inline, in <head>) so switching themes
@@ -147,6 +151,22 @@
       <a href="terms">Terms of Use</a>·<a href="privacy">Privacy Policy</a>
     </div>
   </footer>
+
+  <!-- MOBILE BOTTOM NAV (≤699px only — see .mobile-bottom-nav in styles.css) -->
+  <nav class="mobile-bottom-nav" id="mobileBottomNav" aria-label="Primary">
+    <button class="mobile-nav-btn" onclick="jumpToLive()" aria-label="Live scores">
+      <span class="mobile-nav-icon">🔴</span><span>Live</span>
+    </button>
+    <button class="mobile-nav-btn" onclick="document.getElementById('topLeaguesSection').scrollIntoView({behavior:'smooth'})" aria-label="Leagues">
+      <span class="mobile-nav-icon">🏆</span><span>Leagues</span>
+    </button>
+    <button class="mobile-nav-btn" onclick="setViewMode('favorites'); document.querySelector('.main-layout').scrollIntoView({behavior:'smooth'})" aria-label="Favorites">
+      <span class="mobile-nav-icon">★</span><span>Favorites</span>
+    </button>
+    <button class="mobile-nav-btn" onclick="setViewMode('mypredictions'); document.querySelector('.main-layout').scrollIntoView({behavior:'smooth'})" aria-label="Predictions">
+      <span class="mobile-nav-icon">🔮</span><span>Predict</span>
+    </button>
+  </nav>
 
   <!-- TEAM DETAIL MODAL -->
   <div class="team-modal" id="teamModal">
