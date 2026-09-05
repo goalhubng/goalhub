@@ -3729,3 +3729,12 @@ setInterval(() => {
 // the Worker's own 20s cache for this route, so this adds no real load
 // beyond what that shared edge cache already amortizes across visitors.
 setInterval(renderLiveNowSection, 20000);
+
+// --- PWA: registers the service worker that lets the app shell (not live
+// data — see sw.js) be installed and load offline. Silently no-ops on
+// browsers without support rather than erroring.
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/sw.js").catch(() => { /* offline support just won't be available */ });
+  });
+}

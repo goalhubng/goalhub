@@ -1,0 +1,16 @@
+{
+  "name": "GoalHub — Live Football Scores",
+  "short_name": "GoalHub",
+  "description": "Real live football scores, standings, and squads for 40+ leagues worldwide.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#06080b",
+  "theme_color": "#06080b",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
